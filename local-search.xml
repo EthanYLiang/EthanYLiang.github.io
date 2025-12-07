@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  
+  
+  
+  <entry>
+    <title>hexo+fluid主题配置</title>
+    <link href="/2025/12/07/hexo+fluid%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE/"/>
+    <url>/2025/12/07/hexo+fluid%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE/</url>
+    
+    <content type="html"><![CDATA[<h2 id="1-主题下载和配置"><a href="#1-主题下载和配置" class="headerlink" title="1. 主题下载和配置"></a>1. 主题下载和配置</h2><p>选择自己喜欢的主题：<a href="https://hexo.io/themes/">https://hexo.io/themes/</a></p><p>Fluid主题： <a href="https://github.com/fluid-dev/hexo-theme-fluid">https://github.com/fluid-dev/hexo-theme-fluid</a></p><p>选择Fluid主题主要原因：</p><ul><li><input checked="" disabled="" type="checkbox"> 详细的用户文档</li><li><input checked="" disabled="" type="checkbox"> 多种代码高亮方案</li><li><input checked="" disabled="" type="checkbox"> 支持 LaTeX 数学公式</li><li><input checked="" disabled="" type="checkbox"> 支持 mermaid 流程图</li></ul><h2 id="2、更新部署指令"><a href="#2、更新部署指令" class="headerlink" title="2、更新部署指令"></a>2、更新部署指令</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">hexo clean  <span class="hljs-comment"># 清空一下缓存</span><br>hexo g  <span class="hljs-comment"># 将改动生成更新</span><br>hexo s  <span class="hljs-comment"># 在本地服务器查看</span><br>hexo d      <span class="hljs-comment"># 上传</span><br></code></pre></td></tr></table></figure><h2 id="3、页面美化"><a href="#3、页面美化" class="headerlink" title="3、页面美化"></a>3、页面美化</h2><p>配置指南:  <a href="https://hexo.fluid-dev.com/docs/guide/">https://hexo.fluid-dev.com/docs/guide/</a></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>工具</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  
+</search>
