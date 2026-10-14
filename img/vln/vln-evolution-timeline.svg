@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1700 1400" role="img" aria-labelledby="title desc">
+<title id="title">视觉语言导航研究时间线：2017 至 2026</title>
+<desc id="desc">按 arXiv 首版年份排列 42 项代表性论文与评测研究，分为两条横向时间轴。</desc>
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#132033"/><stop offset="1" stop-color="#1d2c40"/></linearGradient>
+<marker id="arrow" markerUnits="userSpaceOnUse" markerWidth="24" markerHeight="24" refX="20" refY="12" orient="auto"><path d="M3 3 20 12 3 21Z" fill="#6685a0"/></marker>
+<style>text{font-family:"Microsoft YaHei","Noto Sans CJK SC",sans-serif}.title{fill:#f5f9ff;font-size:49px;font-weight:700}.subtitle{fill:#b8c9d8;font-size:25px}.year{fill:#f7fbff;font-size:24px;font-weight:700}.item{fill:#e8f0f7;font-size:19px;font-weight:600}.legend{fill:#c8d6e3;font-size:21px}</style>
+</defs>
+<rect width="1700" height="1400" rx="28" fill="url(#bg)"/>
+<text class="title" x="80" y="78">VLN 演进时间线</text>
+<text class="subtitle" x="82" y="119">任务与评测 · 表示与训练 · 视觉语言模型与机器人执行</text>
+<g class="legend" transform="translate(85 144)"><circle r="9" fill="#51c4e7"/><text x="18" y="7">任务／评测</text><circle cx="206" r="9" fill="#aa91f4"/><text x="224" y="7">表示／训练</text><circle cx="430" r="9" fill="#f5bb75"/><text x="448" y="7">VLM／VLA</text><circle cx="624" r="9" fill="#5ad5bd"/><text x="642" y="7">机器人／连续执行</text></g>
+<path d="M74 191 H1626" stroke="#6685a0" stroke-width="6" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M244 231 V242" stroke="#6685a0" stroke-width="3"/>
+<circle cx="244" cy="191" r="39" fill="#27415a" stroke="#84aac7" stroke-width="3"/><text x="244" y="200" text-anchor="middle" class="year">2017</text>
+<rect x="99" y="250" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="99" y="250" width="6" height="48" rx="3" fill="#51c4e7"/><text x="117" y="281" class="item">R2R：室内路线指令</text>
+<path d="M554 231 V242" stroke="#6685a0" stroke-width="3"/>
+<circle cx="554" cy="191" r="39" fill="#27415a" stroke="#84aac7" stroke-width="3"/><text x="554" y="200" text-anchor="middle" class="year">2018</text>
+<rect x="409" y="250" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="409" y="250" width="6" height="48" rx="3" fill="#aa91f4"/><text x="427" y="281" class="item">Speaker-Follower：增广</text>
+<rect x="409" y="306" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="409" y="306" width="6" height="48" rx="3" fill="#51c4e7"/><text x="427" y="337" class="item">SPL：导航效率评测</text>
+<rect x="409" y="362" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="409" y="362" width="6" height="48" rx="3" fill="#51c4e7"/><text x="427" y="393" class="item">Touchdown：街景导航</text>
+<rect x="409" y="418" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="409" y="418" width="6" height="48" rx="3" fill="#aa91f4"/><text x="427" y="449" class="item">RCM＋SIL：强化与自模仿</text>
+<path d="M864 231 V242" stroke="#6685a0" stroke-width="3"/>
+<circle cx="864" cy="191" r="39" fill="#27415a" stroke="#84aac7" stroke-width="3"/><text x="864" y="200" text-anchor="middle" class="year">2019</text>
+<rect x="719" y="250" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="719" y="250" width="6" height="48" rx="3" fill="#51c4e7"/><text x="737" y="281" class="item">REVERIE：物体指代</text>
+<rect x="719" y="306" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="719" y="306" width="6" height="48" rx="3" fill="#aa91f4"/><text x="737" y="337" class="item">EnvDrop：环境扰动</text>
+<rect x="719" y="362" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="719" y="362" width="6" height="48" rx="3" fill="#51c4e7"/><text x="737" y="393" class="item">R4R＋CLS：路径忠实度</text>
+<rect x="719" y="418" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="719" y="418" width="6" height="48" rx="3" fill="#51c4e7"/><text x="737" y="449" class="item">nDTW／SDTW：轨迹度量</text>
+<rect x="719" y="474" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="719" y="474" width="6" height="48" rx="3" fill="#51c4e7"/><text x="737" y="505" class="item">CVDN：对话导航</text>
+<rect x="719" y="530" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="719" y="530" width="6" height="48" rx="3" fill="#51c4e7"/><text x="737" y="561" class="item">HANNA：求助导航</text>
+<path d="M1174 231 V242" stroke="#6685a0" stroke-width="3"/>
+<circle cx="1174" cy="191" r="39" fill="#27415a" stroke="#84aac7" stroke-width="3"/><text x="1174" y="200" text-anchor="middle" class="year">2020</text>
+<rect x="1029" y="250" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1029" y="250" width="6" height="48" rx="3" fill="#aa91f4"/><text x="1047" y="281" class="item">PREVALENT：域内预训练</text>
+<rect x="1029" y="306" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1029" y="306" width="6" height="48" rx="3" fill="#51c4e7"/><text x="1047" y="337" class="item">VLN-CE：连续动作</text>
+<rect x="1029" y="362" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1029" y="362" width="6" height="48" rx="3" fill="#51c4e7"/><text x="1047" y="393" class="item">RxR：多语言路线</text>
+<rect x="1029" y="418" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1029" y="418" width="6" height="48" rx="3" fill="#aa91f4"/><text x="1047" y="449" class="item">Recurrent VLN-BERT：记忆</text>
+<rect x="1029" y="474" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1029" y="474" width="6" height="48" rx="3" fill="#5ad5bd"/><text x="1047" y="505" class="item">Sim-to-Real：实机迁移</text>
+<path d="M1484 231 V242" stroke="#6685a0" stroke-width="3"/>
+<circle cx="1484" cy="191" r="39" fill="#27415a" stroke="#84aac7" stroke-width="3"/><text x="1484" y="200" text-anchor="middle" class="year">2021</text>
+<rect x="1339" y="250" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1339" y="250" width="6" height="48" rx="3" fill="#51c4e7"/><text x="1357" y="281" class="item">SOON：目标描述导航</text>
+<rect x="1339" y="306" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1339" y="306" width="6" height="48" rx="3" fill="#aa91f4"/><text x="1357" y="337" class="item">Airbert：预训练</text>
+<rect x="1339" y="362" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1339" y="362" width="6" height="48" rx="3" fill="#aa91f4"/><text x="1357" y="393" class="item">HAMT：层级历史</text>
+<path d="M74 770 H1626" stroke="#6685a0" stroke-width="6" stroke-linecap="round" marker-end="url(#arrow)"/>
+<path d="M244 810 V822" stroke="#6685a0" stroke-width="3"/>
+<circle cx="244" cy="770" r="39" fill="#27415a" stroke="#84aac7" stroke-width="3"/><text x="244" y="779" text-anchor="middle" class="year">2022</text>
+<rect x="99" y="830" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="99" y="830" width="6" height="48" rx="3" fill="#aa91f4"/><text x="117" y="861" class="item">DUET：在线拓扑图</text>
+<rect x="99" y="886" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="99" y="886" width="6" height="48" rx="3" fill="#5ad5bd"/><text x="117" y="917" class="item">Waypoint：候选路点</text>
+<rect x="99" y="942" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="99" y="942" width="6" height="48" rx="3" fill="#aa91f4"/><text x="117" y="973" class="item">BEVBert：局部度量图</text>
+<path d="M554 810 V822" stroke="#6685a0" stroke-width="3"/>
+<circle cx="554" cy="770" r="39" fill="#27415a" stroke="#84aac7" stroke-width="3"/><text x="554" y="779" text-anchor="middle" class="year">2023</text>
+<rect x="409" y="830" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="409" y="830" width="6" height="48" rx="3" fill="#5ad5bd"/><text x="427" y="861" class="item">ETPNav：连续拓扑规划</text>
+<rect x="409" y="886" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="409" y="886" width="6" height="48" rx="3" fill="#f5bb75"/><text x="427" y="917" class="item">NavGPT：LLM 零样本</text>
+<rect x="409" y="942" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="409" y="942" width="6" height="48" rx="3" fill="#aa91f4"/><text x="427" y="973" class="item">ScaleVLN：数据规模化</text>
+<rect x="409" y="998" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="409" y="998" width="6" height="48" rx="3" fill="#51c4e7"/><text x="427" y="1029" class="item">AerialVLN：空中导航</text>
+<path d="M864 810 V822" stroke="#6685a0" stroke-width="3"/>
+<circle cx="864" cy="770" r="39" fill="#27415a" stroke="#84aac7" stroke-width="3"/><text x="864" y="779" text-anchor="middle" class="year">2024</text>
+<rect x="719" y="830" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="719" y="830" width="6" height="48" rx="3" fill="#f5bb75"/><text x="737" y="861" class="item">NaVid：单目视频动作</text>
+<rect x="719" y="886" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="719" y="886" width="6" height="48" rx="3" fill="#f5bb75"/><text x="737" y="917" class="item">Open-Nav：开源 LLM</text>
+<rect x="719" y="942" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="719" y="942" width="6" height="48" rx="3" fill="#f5bb75"/><text x="737" y="973" class="item">Uni-NaVid：统一导航</text>
+<rect x="719" y="998" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="719" y="998" width="6" height="48" rx="3" fill="#5ad5bd"/><text x="737" y="1029" class="item">NaVILA：腿式机器人</text>
+<rect x="719" y="1054" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="719" y="1054" width="6" height="48" rx="3" fill="#aa91f4"/><text x="737" y="1085" class="item">SRDF：自精炼数据</text>
+<path d="M1174 810 V822" stroke="#6685a0" stroke-width="3"/>
+<circle cx="1174" cy="770" r="39" fill="#27415a" stroke="#84aac7" stroke-width="3"/><text x="1174" y="779" text-anchor="middle" class="year">2025</text>
+<rect x="1029" y="830" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1029" y="830" width="6" height="48" rx="3" fill="#51c4e7"/><text x="1047" y="861" class="item">OpenFly：空中平台</text>
+<rect x="1029" y="886" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1029" y="886" width="6" height="48" rx="3" fill="#5ad5bd"/><text x="1047" y="917" class="item">SmartWay：回溯路点</text>
+<rect x="1029" y="942" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1029" y="942" width="6" height="48" rx="3" fill="#aa91f4"/><text x="1047" y="973" class="item">VLN-R1：强化微调</text>
+<rect x="1029" y="998" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1029" y="998" width="6" height="48" rx="3" fill="#f5bb75"/><text x="1047" y="1029" class="item">StreamVLN：流式记忆</text>
+<rect x="1029" y="1054" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1029" y="1054" width="6" height="48" rx="3" fill="#51c4e7"/><text x="1047" y="1085" class="item">VLN-PE：物理仿真</text>
+<rect x="1029" y="1110" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1029" y="1110" width="6" height="48" rx="3" fill="#aa91f4"/><text x="1047" y="1141" class="item">CorrectNav：自纠正</text>
+<rect x="1029" y="1166" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1029" y="1166" width="6" height="48" rx="3" fill="#f5bb75"/><text x="1047" y="1197" class="item">NavFoM：跨形态导航</text>
+<rect x="1029" y="1222" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1029" y="1222" width="6" height="48" rx="3" fill="#5ad5bd"/><text x="1047" y="1253" class="item">DualVLN：双系统</text>
+<rect x="1029" y="1278" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1029" y="1278" width="6" height="48" rx="3" fill="#f5bb75"/><text x="1047" y="1309" class="item">Efficient-VLN：低延迟</text>
+<path d="M1484 810 V822" stroke="#6685a0" stroke-width="3"/>
+<circle cx="1484" cy="770" r="39" fill="#27415a" stroke="#84aac7" stroke-width="3"/><text x="1484" y="779" text-anchor="middle" class="year">2026</text>
+<rect x="1339" y="830" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1339" y="830" width="6" height="48" rx="3" fill="#5ad5bd"/><text x="1357" y="861" class="item">StereoNav：立体视觉</text>
+<rect x="1339" y="886" width="290" height="48" rx="10" fill="#21334a" stroke="#3c5872" stroke-width="1"/><rect x="1339" y="886" width="6" height="48" rx="3" fill="#51c4e7"/><text x="1357" y="917" class="item">系统性真机评测综述</text>
+<path d="M80 690 H1620 M80 1350 H1620" stroke="#50677e" stroke-width="2" opacity=".55"/>
+<text x="82" y="1380" fill="#a9becf" font-size="19" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif">年份按论文 arXiv 首版；不同任务与评测协议的成绩不可直接比较。</text>
+</svg>

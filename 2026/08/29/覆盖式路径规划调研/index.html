@@ -1,0 +1,1416 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/bg/ely.png">
+  <link rel="icon" href="/img/bg/ely.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="EthanYLiang">
+  <meta name="keywords" content="SLAM,建图定位,多模态融合,融合感知,规划控制,VLN,视觉语言导航,具身智能,移动机器人,ROS">
+  
+    <meta name="description" content="覆盖式路径规划（CPP）要走遍一片区域而不是从 A 点到 B 点，评价标准也完全不同。本文 按「区域怎么被切开」这条轴梳理 CPP 的算法体系，回顾四篇综述二十年的关注点迁移， 并给出六个主流开源实现的实测对比。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="覆盖式路径规划调研">
+<meta property="og:url" content="https://ethanyliang.github.io/2026/08/29/%E8%A6%86%E7%9B%96%E5%BC%8F%E8%B7%AF%E5%BE%84%E8%A7%84%E5%88%92%E8%B0%83%E7%A0%94/index.html">
+<meta property="og:site_name" content="EthanYLiang">
+<meta property="og:description" content="覆盖式路径规划（CPP）要走遍一片区域而不是从 A 点到 B 点，评价标准也完全不同。本文 按「区域怎么被切开」这条轴梳理 CPP 的算法体系，回顾四篇综述二十年的关注点迁移， 并给出六个主流开源实现的实测对比。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ethanyliang.github.io/img/plan/coverage-planning-banner.svg">
+<meta property="article:published_time" content="2026-08-29T13:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-14T08:20:45.428Z">
+<meta property="article:author" content="EthanYLiang">
+<meta property="article:tag" content="单元分解">
+<meta property="article:tag" content="巡检">
+<meta property="article:tag" content="开源实现">
+<meta property="article:tag" content="覆盖式路径规划">
+<meta property="article:tag" content="调研">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://ethanyliang.github.io/img/plan/coverage-planning-banner.svg">
+  
+  
+  
+  <title>覆盖式路径规划调研 - EthanYLiang</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/KaTeX/0.16.2/katex.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"ethanyliang.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"><link rel="alternate" href="/atom.xml" title="EthanYLiang" type="application/atom+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>EthanY&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/series/vln/" target="_self">
+                <i class="iconfont icon-book"></i>
+                <span>VLN 系列</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/atom.xml" target="_self">
+                
+                <span>RSS</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/series/vln/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-book"></i>
+                  <span>VLN 系列</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/atom.xml" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-link-fill"></i>
+                  <span>RSS</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/plan/coverage-planning-banner.svg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="覆盖式路径规划调研"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-29 21:00" pubdate>
+          2026年8月29日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          7.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          66 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">覆盖式路径规划调研</h1>
+            
+            
+              <div class="markdown-body">
+                
+    
+                <blockquote>
+<p>覆盖式路径规划（CPP）要走遍一片区域而不是从 A 点到 B 点，评价标准也完全不同。本文
+按「区域怎么被切开」这条轴梳理 CPP 的算法体系，回顾四篇综述二十年的关注点迁移，
+并给出六个主流开源实现的实测对比。</p>
+</blockquote>
+<span id="more"></span>
+<h2 id="一、问题定义">一、问题定义</h2>
+<h3 id="1-1-覆盖与点到点的区别">1.1 覆盖与点到点的区别</h3>
+<p>全局路径规划回答「怎么从 A 走到 B」，覆盖式路径规划（Coverage Path Planning, CPP）
+回答的是「<strong>怎么走遍这片区域的每一个可达位置</strong>」。扫地机器人、割草机、农业植保、
+消杀、巡检安防都属于后者。</p>
+<p>这个差别不只是目标不同，<strong>评价体系是另一套</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>含义</th>
+<th>点到点规划里有没有</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>覆盖率</strong></td>
+<td>区域内被传感器视场（或机体）扫过的比例</td>
+<td>无</td>
+</tr>
+<tr>
+<td><strong>重复率</strong></td>
+<td>路径中重叠部分占比，越低越好</td>
+<td>无</td>
+</tr>
+<tr>
+<td><strong>路径长度 / 时间</strong></td>
+<td>完成覆盖的总代价</td>
+<td>有</td>
+</tr>
+<tr>
+<td><strong>转弯次数与累计转角</strong></td>
+<td>转弯要减速、停车、原地旋转，是实际耗时的大头</td>
+<td>弱</td>
+</tr>
+<tr>
+<td><strong>重访间隔</strong></td>
+<td>周期性巡检中同一位置两次被访问的时间差</td>
+<td>无</td>
+</tr>
+</tbody>
+</table>
+<p><strong>转弯代价是最容易被低估的一项。</strong> Bormann 等人在 550 多张真实户型图上做的对比里，
+神经网络法的覆盖率不差，但路径最长、累计转角最大、主观观感最差；而 Boustrophedon
+分解转弯最少。在实机上，<strong>几十次多余的原地旋转带来的时间损失，往往超过路径长度
+差异本身</strong>——因为非完整约束底盘的原地转向速度远低于直行。</p>
+<h3 id="1-2-复杂度">1.2 复杂度</h3>
+<p>CPP 与<strong>覆盖旅行商问题</strong>和<strong>割草机问题</strong>同源，<strong>均为 NP-hard</strong>。这决定了：</p>
+<ul>
+<li>精确最优解只在很小规模下可求</li>
+<li>实用算法基本是「<strong>先用几何把问题拆小，再在小规模上做组合优化</strong>」</li>
+<li>「完备性」（只要存在完全覆盖的路径就一定能找到）和「最优性」要分开谈，
+绝大多数工程算法只保证前者</li>
+</ul>
+<p>Galceran 与 Carreras 在 2013 年的综述里总结了 CPP 的<strong>六条理想准则</strong>：
+完整性、高效性、连续性、避障、轨迹简单性、最优性。<strong>没有算法能同时满足全部六条</strong>，
+选型本质上是在这六条之间取舍。</p>
+<h2 id="二、算法体系：按「区域怎么被切开」看">二、算法体系：按「区域怎么被切开」看</h2>
+<p>CPP 的算法名目繁多，但真正的分野只有一个问题：<strong>要不要先把区域切开，以及怎么切</strong>。</p>
+<pre><code class=" mermaid">flowchart TD
+    A[&quot;目标区域 + 障碍&quot;] --&gt; B&#123;&quot;要不要先切开？&quot;&#125;
+    B --&gt;|&quot;不切&quot;| C[&quot;栅格遍历&lt;br/&gt;Wavefront / Spiral-STC / BSA&quot;]
+    B --&gt;|&quot;几何切&quot;| D[&quot;单元分解&lt;br/&gt;梯形 / Boustrophedon / Morse&quot;]
+    B --&gt;|&quot;语义切&quot;| E[&quot;房间分割&lt;br/&gt;Voronoi / 形态学&quot;]
+    B --&gt;|&quot;不切，学策略&quot;| F[&quot;DRL&lt;br/&gt;DQN / PPO / A3C&quot;]
+    D --&gt; G[&quot;cell 内弓字形往复&quot;]
+    E --&gt; G
+    G --&gt; H&#123;&quot;cell 间顺序怎么定？&quot;&#125;
+    H --&gt;|&quot;邻接图穷举&quot;| I[&quot;走一遍就完&quot;]
+    H --&gt;|&quot;组合优化&quot;| J[&quot;TSP / GTSP&lt;br/&gt;近年主流&quot;]
+    C --&gt; K[&quot;路径后处理&lt;br/&gt;Clothoid 平滑&quot;]
+    I --&gt; K
+    J --&gt; K
+</code></pre>
+<h3 id="2-1-不切：直接在栅格上走">2.1 不切：直接在栅格上走</h3>
+<p>把地图栅格化，直接设计一条遍历所有自由栅格的规则。</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>原理</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Wavefront / 距离变换</strong></td>
+<td>从目标点做波前扩散，按梯度遍历</td>
+<td>简单直观，适合规则区域</td>
+</tr>
+<tr>
+<td><strong>Spiral-STC</strong></td>
+<td>划分为 2D×2D 大单元，构建生成树后沿树螺旋覆盖</td>
+<td><strong>保证完全覆盖且重复率极低</strong>，需预知全局地图</td>
+</tr>
+<tr>
+<td><strong>BSA（回溯螺旋）</strong></td>
+<td>螺旋覆盖 + 回溯机制处理死角</td>
+<td>可处理更复杂地图</td>
+</tr>
+<tr>
+<td><strong>神经网络法</strong></td>
+<td>Hopfield / 竞争型网络的能量最小化</td>
+<td>可应对动态障碍，<strong>但路径长、转弯多</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>生成树覆盖（STC）系列的价值在于重复率</strong>：因为沿树走，理论上每个大单元只经过一次。
+代价是把地图按 2D×2D 粗化，<strong>分辨率损失在窄通道场景会致命</strong>。</p>
+<h3 id="2-2-几何切：单元分解">2.2 几何切：单元分解</h3>
+<p>把自由空间切成若干互不重叠的简单子区域（cell），并集恰好等于自由空间，
+<strong>每个 cell 内部无障碍，可用简单的弓字形往复走完</strong>。</p>
+<ul>
+<li><strong>梯形分解</strong>：在每个障碍物顶点做垂直线，产生大量细碎 cell。实现最简单，但
+cell 多、路径长。</li>
+<li><strong>Boustrophedon（牛耕式）分解</strong>：<strong>只在「连通性发生变化」的临界点处划分</strong>，
+cell 数量通常约为梯形分解的一半，覆盖路径显著更短。<strong>这是室内覆盖最成熟的方法。</strong></li>
+<li><strong>Morse 分解</strong>：Boustrophedon 的推广，基于 Morse 函数的临界点划分，
+可处理非多边形障碍，且<strong>临界点可以在线检测</strong>，理论更完备但实现复杂。</li>
+</ul>
+<p><strong>Boustrophedon 的失效场景要记住</strong>：在杂乱环境中，障碍物顶点密集会导致 cell 被切得
+极碎，每个 cell 只够走一两趟，cell 间转移的代价反而主导了总路径。这时候它退化得
+比栅格法还差，Bormann 等人建议与局部能量法互补使用。</p>
+<h3 id="2-3-切完之后：遍历顺序才是近年的主战场">2.3 切完之后：遍历顺序才是近年的主战场</h3>
+<p>分解完成后还剩一个问题：<strong>这些 cell 按什么顺序走</strong>。早期做法是在邻接图上找一条
+穷举遍历路径，走通即可，不追求最优。近年的主流是把它建模成组合优化问题：</p>
+<ul>
+<li><strong>Grid-based TSP</strong>：把栅格中心当节点求解 TSP。路径质量高，但<strong>计算开销随区域
+急剧上升</strong>——Bormann 等人的实验里，优化类方法平均 41.6 秒一个房间，最坏超过 30 分钟，
+而启发式方法都在 4 秒以内。</li>
+<li><strong>广义旅行商问题（GTSP）</strong>：把 BCD 分解后的每个 cell 视为一个「点集」（该 cell
+有多个可能的进入/离开点），求解 GTSP 得到最优 cell 遍历序列。
+Bähnemann 等人的工作把这条路线做扎实了，是目前多边形覆盖里效果最好的组合优化方案。</li>
+</ul>
+<p><strong>一条负面结果值得记</strong>：Manzini 与 Murphy 尝试把 BCD 路径参数化成可微形式，
+用梯度下降优化扫描方向和间距，<strong>结论是搜索空间高度非凸、梯度方法效果有限</strong>。
+这条路暂时走不通，<strong>组合优化仍是当前的正解</strong>。</p>
+<h3 id="2-4-语义切：先分房间再覆盖">2.4 语义切：先分房间再覆盖</h3>
+<p>室内场景还有第三条路：不按几何临界点切，<strong>按语义切成房间</strong>，再逐个房间覆盖，
+最后用 TSP 优化房间访问顺序。Fraunhofer IPA 的工具链就是这个结构——
+房间分割、房间内覆盖、多房间访问顺序三个模块分离。</p>
+<p>好处是<strong>分解结果符合人的直觉</strong>（一个房间一次走完，不会来回横跨），
+并且天然支持「跳过某些房间」这类业务需求。</p>
+<h3 id="2-5-不切，学一个策略出来">2.5 不切，学一个策略出来</h3>
+<p>深度强化学习路线把覆盖建模成 MDP，直接学一个从状态到动作的策略：DQN 处理大状态空间、
+PPO 用于工业喷涂、A3C/DDPG 处理连续控制。<strong>卖点是不需要显式建模几何约束</strong>。</p>
+<p><strong>但工程落地要清醒</strong>：训练成本高、可解释性差、对地图变化的泛化未经充分验证。
+在<strong>静态已知地图</strong>这个前提下，几何方法的确定性和可调试性目前仍明显占优。
+DRL 真正有价值的场景是<strong>未知或动态环境</strong>——那里几何方法本身也不成立。</p>
+<h3 id="2-6-路径后处理：平滑">2.6 路径后处理：平滑</h3>
+<p>上面所有方法产出的都是折线路径，弓字形的直角转弯对非完整约束底盘尤其难跟踪
+（要减速、停车、原地旋转、再起步）。</p>
+<p>Šelek 等人的做法是用 <strong>clothoid（回旋曲线）</strong> 替换转弯段。clothoid 的<strong>曲率随弧长
+线性变化</strong>，这正好匹配「方向盘匀速转动」或「差速底盘角速度线性变化」的物理过程，
+使机器人能以时间最优的方式通过转弯，<strong>不必在转弯点停车旋转</strong>。他们在 Pioneer 3DX
+上实测降低了覆盖时间、路径长度和重叠面积。</p>
+<p>注意他们平滑的对象是<strong>生成树覆盖（RSTC）路径</strong>，不是弓字形路径——不过思路可迁移。</p>
+<h2 id="三、四篇综述，二十年的关注点迁移">三、四篇综述，二十年的关注点迁移</h2>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>2013 Galceran</th>
+<th>2018 Bormann</th>
+<th>2019 Almadhoun</th>
+<th>2025 Jayalakshmi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>研究对象</td>
+<td>单机 2D/3D</td>
+<td>室内房间级</td>
+<td>多机 3D 重建</td>
+<td>动态环境多机</td>
+</tr>
+<tr>
+<td>方法重心</td>
+<td>几何分解</td>
+<td><strong>实验对比</strong></td>
+<td>分布式协调</td>
+<td>强化学习 / 预测</td>
+</tr>
+<tr>
+<td>独特贡献</td>
+<td>建立分类体系</td>
+<td><strong>开源实现 + 550 张户型图数据集</strong></td>
+<td>视点-路径-重建流程</td>
+<td>学习类方法梳理</td>
+</tr>
+<tr>
+<td>环境假设</td>
+<td>以静态为主</td>
+<td>静态</td>
+<td>静态 + 部分动态</td>
+<td><strong>动态为核心</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>共同底座</strong>：Boustrophedon、STC、栅格法在四篇综述中被反复引用，是 CPP 的基石。</p>
+<p>另有一篇 2021 年 IEEE Access 的综述（<em>A Comprehensive Review of Coverage Path
+Planning in Robotics Using Classical and Heuristic Algorithms</em>）被引已超过 340 次，
+按经典法与启发式法两分，可作为 2013 与 2025 之间的补充参照。</p>
+<h3 id="一个从引文数据里读出来的观察">一个从引文数据里读出来的观察</h3>
+<p>顺着 Galceran 2013 的被引展开会发现一个明显的现象：<strong>2021 年以后引用它的高被引论文，
+绝大多数是无人机、农业和海事搜救</strong>——多机 UAV 覆盖、精准农业路径规划、
+水面搜救覆盖占据了前列，<strong>室内地面机器人的 CPP 几乎看不到高被引新作</strong>。</p>
+<p>我的解读是：<strong>室内地面 CPP 在学术上被认为基本解决了</strong>。剩下的困难是工程性的
+（算力、跟踪精度、动态障碍、长期运行）。</p>
+<h2 id="四、开源实现">四、开源实现</h2>
+<p>以下数据为 <strong>2026-08-29 通过 GitHub API 实测</strong>，非转述。</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>算法</th>
+<th>Star</th>
+<th>许可证</th>
+<th>最后推送</th>
+<th>输入</th>
+<th>生态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/Fields2Cover/Fields2Cover">Fields2Cover</a></td>
+<td>BCD / 梯形等多种</td>
+<td>880</td>
+<td><strong>BSD-3-Clause</strong></td>
+<td>2026-08</td>
+<td>多边形（含孔洞）</td>
+<td>独立库，面向农业</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/nobleo/full_coverage_path_planner">nobleo/full_coverage_path_planner</a></td>
+<td>BSA 螺旋</td>
+<td>671</td>
+<td><strong>Apache-2.0</strong></td>
+<td>2025-05</td>
+<td>costmap</td>
+<td>ROS 1 / MBF 插件</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/ethz-asl/polygon_coverage_planning">ethz-asl/polygon_coverage_planning</a></td>
+<td>BCD + GTSP</td>
+<td>655</td>
+<td><strong>GPL-3.0</strong></td>
+<td><strong>2023-11（已停更）</strong></td>
+<td>多边形（含孔洞）</td>
+<td>ROS 1</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/ipa320/ipa_coverage_planning">ipa320/ipa_coverage_planning</a></td>
+<td>8 种可选</td>
+<td>359</td>
+<td><strong>见下方注意</strong></td>
+<td>2025-11</td>
+<td>OccupancyGrid</td>
+<td>ROS 1</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/Greenzie/boustrophedon_planner">Greenzie/boustrophedon_planner</a></td>
+<td>BCD</td>
+<td>314</td>
+<td><strong>LGPL-3.0</strong></td>
+<td>2024-05</td>
+<td>多边形</td>
+<td>ROS 1，ActionLib</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/open-navigation/opennav_coverage">open-navigation/opennav_coverage</a></td>
+<td>Fields2Cover 封装</td>
+<td>314</td>
+<td><strong>Apache-2.0</strong></td>
+<td>2026-08</td>
+<td>多边形</td>
+<td><strong>ROS 2 / Nav2</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="选型的几个维度">选型的几个维度</h3>
+<p>抛开具体项目，选型时真正会卡住的是这几点：</p>
+<ol>
+<li><strong>输入形式</strong>：接受多边形，还是只接受 OccupancyGrid / costmap？
+如果业务是「用户圈一片区域」，前者省掉一整套地图裁剪逻辑。</li>
+<li><strong>孔洞支持</strong>：区域内部有柱子、固定设备时，规划器能不能直接处理带孔多边形。
+不支持的话要么预处理拆分，要么靠代价地图兜底。</li>
+<li><strong>许可证</strong>：见上。<strong>这一条决定能不能用，应该第一个查而不是最后一个查。</strong></li>
+<li><strong>输出形式</strong>：多数项目输出的是航点序列（<code>PoseArray</code> / <code>Pose2D[]</code>），
+<strong>需要自己写一个节点逐点下发给导航栈</strong>，这部分工作量在选型时容易被漏算。</li>
+<li><strong>ROS 版本</strong>：ROS 1 生态里可选项多但多数已停更；ROS 2 侧目前主要是
+Nav2 官方的 opennav_coverage 一条路。</li>
+<li><strong>覆盖语义</strong>：是<strong>机体覆盖</strong>（清扫、消杀，要求实体走过）还是
+<strong>传感器视场覆盖</strong>（巡检、监控，扫到即可）。两者的行距计算完全不同，
+后者的行距由 FOV 决定，通常远大于机体宽度。</li>
+</ol>
+<h2 id="五、几个值得注意的方向">五、几个值得注意的方向</h2>
+<p><strong>转弯最小化被单独立题了。</strong> 有工作专门研究非凸环境的最优分区以最小化转弯次数
+（RA-L 2022），而不是最小化路径长度。这与 1.1 节的观察一致——<strong>转弯才是实际耗时的大头</strong>。</p>
+<p><strong>巡检场景带来了新指标。</strong> CPP 的传统目标是「走完」，而周期性巡检关心的是
+「<strong>多久回来一次</strong>」。Kachavarapu 等人的 FaRe-CPP 面向巡逻机器人，用长距离传感器
+信息生成覆盖航点并做随机搜索优化，报告路径长度减少 21%–40%、重访时间减少 33%–45%。
+<strong>这是一个和覆盖率正交的优化目标</strong>，传统 CPP 方法并不直接优化它。</p>
+<p><strong>多机从启发式转向了组合优化与学习。</strong> 近年有把大规模多机 CPP 做成局部搜索的工作
+（AAAI 2024），也有用混合整数规划求时间最优多机覆盖的（RA-L 2023）。
+学习类的代表是 MARVEL（ICRA 2025），用图注意力网络处理<strong>受限视场</strong>下的多机协同——
+注意它解决的是<strong>探索（exploration）问题而非覆盖（coverage）</strong>，两者目标不同，
+不要混为一谈。</p>
+<p><strong>可重构机器人是个冷门但有趣的分支。</strong> 有一类工作研究能改变自身形状的瓦片式机器人
+如何覆盖——形状可变意味着<strong>覆盖宽度不再是常数</strong>，这让传统的等行距假设失效。</p>
+<h2 id="六、我的判断">六、我的判断</h2>
+<p><strong>如果场景是室内静态已知地图 + 多边形圈定区域，BCD 加上 GTSP 优化遍历顺序仍是
+当前最优实践</strong>，DRL 方法的工程成熟度还不足以替代它。这个结论在过去几年基本没变，
+也印证了第三节那个「室内地面 CPP 已经成熟」的观察。</p>
+<p><strong>但真正决定项目成败的往往不是算法选择</strong>，而是三件更琐碎的事：</p>
+<ol>
+<li><strong>航点下发与跟踪</strong>——几乎所有开源项目都只到「输出一串航点」为止，
+从航点到实际平滑行驶之间的工程量，比算法本身大</li>
+<li><strong>转弯的实际代价</strong>——纸面上的路径长度对比，可能和实机耗时排序完全不同</li>
+</ol>
+<p><strong>最值得投入的优化方向</strong>，我认为是路径后处理而非路径生成：用 clothoid 之类的
+曲率连续曲线替换直角转弯，收益直接体现在耗时和跟踪稳定性上，且<strong>不依赖于换算法</strong>，
+对现有系统是增量改进。</p>
+<h2 id="七、参考">七、参考</h2>
+<p><strong>综述</strong></p>
+<ul>
+<li>Galceran, E., &amp; Carreras, M. (2013). A survey on coverage path planning for robotics.
+<em>Robotics and Autonomous Systems</em>, 61(12), 1258–1276.
+DOI: <a target="_blank" rel="noopener" href="https://doi.org/10.1016/j.robot.2013.09.004">10.1016/j.robot.2013.09.004</a></li>
+<li>Bormann, R., Jordan, F., Hampp, J., &amp; Haegele, M. (2018). Indoor coverage path
+planning: Survey, implementation, analysis. <em>ICRA 2018</em>.
+｜💻 <a target="_blank" rel="noopener" href="https://github.com/ipa320/ipa_coverage_planning">ipa_coverage_planning</a></li>
+<li>Almadhoun, R., Taha, T., Seneviratne, L., &amp; Zweiri, Y. (2019). A survey on
+multi-robot coverage path planning for model reconstruction and mapping.
+<em>SN Applied Sciences</em>, 1(8), 847.
+DOI: <a target="_blank" rel="noopener" href="https://doi.org/10.1007/s42452-019-0872-y">10.1007/s42452-019-0872-y</a></li>
+<li>Jayalakshmi, K. P., Nair, V. G., &amp; Sathish, D. (2025). A comprehensive survey on
+coverage path planning for mobile robots in dynamic environments. <em>IEEE Access</em>, 13.
+DOI: <a target="_blank" rel="noopener" href="https://doi.org/10.1109/ACCESS.2025.3556446">10.1109/ACCESS.2025.3556446</a></li>
+<li>Tan, C. S., et al. (2021). A comprehensive review of coverage path planning in
+robotics using classical and heuristic algorithms. <em>IEEE Access</em>, 9.
+DOI: <a target="_blank" rel="noopener" href="https://doi.org/10.1109/ACCESS.2021.3108177">10.1109/ACCESS.2021.3108177</a></li>
+</ul>
+<p><strong>方法</strong></p>
+<ul>
+<li>Choset, H., &amp; Pignon, P. (1998). Coverage path planning: The boustrophedon cellular
+decomposition. <em>Field and Service Robotics</em>.
+DOI: <a target="_blank" rel="noopener" href="https://doi.org/10.1007/978-1-4471-1273-0_32">10.1007/978-1-4471-1273-0_32</a></li>
+<li>Bähnemann, R., Lawrance, N., Chung, J. J., et al. (2021). Revisiting boustrophedon
+coverage path planning as a generalized traveling salesman problem.
+<em>Springer Proceedings in Advanced Robotics</em>（FSR 2019）.
+DOI: <a target="_blank" rel="noopener" href="https://doi.org/10.1007/978-981-15-9460-1_20">10.1007/978-981-15-9460-1_20</a>
+｜💻 <a target="_blank" rel="noopener" href="https://github.com/ethz-asl/polygon_coverage_planning">polygon_coverage_planning</a></li>
+<li>Manzini, T., &amp; Murphy, R. (2023). Differentiable boustrophedon paths that enable
+optimization via gradient descent. <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2309.09882">arXiv:2309.09882</a></li>
+<li>Šelek, A., Seder, M., Brezak, M., &amp; Petrović, I. (2022). Smooth complete coverage
+trajectory planning algorithm for a nonholonomic robot. <em>Sensors</em>, 22(23), 9269.
+DOI: <a target="_blank" rel="noopener" href="https://doi.org/10.3390/s22239269">10.3390/s22239269</a></li>
+<li>Kachavarapu, S., Doernbach, T., &amp; Gerndt, R. (2025). Fast-revisit coverage path
+planning for autonomous mobile patrol robots using long-range sensor information.
+<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2501.07343">arXiv:2501.07343</a></li>
+<li>Karakaya, S., &amp; Konyar, M. Z. (2025). Hybrid boustrophedon and direction-biased
+region transitions for mobile robot coverage path planning.
+<em>Applied Sciences</em>, 15(23), 12666.
+DOI: <a target="_blank" rel="noopener" href="https://doi.org/10.3390/app152312666">10.3390/app152312666</a></li>
+<li>Ni, J., Gu, Y., &amp; Tang, G. (2024). Cooperative coverage path planning for
+multi-mobile robots based on improved K-means clustering and deep reinforcement
+learning. <em>Electronics</em>, 13(5), 944.
+DOI: <a target="_blank" rel="noopener" href="https://doi.org/10.3390/electronics13050944">10.3390/electronics13050944</a></li>
+<li>MARVEL: Multi-agent reinforcement learning for constrained field-of-view multi-robot
+exploration in large-scale environments. <em>ICRA 2025</em>.
+<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2502.20217">arXiv:2502.20217</a>
+｜💻 <a target="_blank" rel="noopener" href="https://github.com/marmotlab/MARVEL">marmotlab/MARVEL</a></li>
+</ul>
+<p><strong>开源实现</strong>（Star 数与许可证为 2026-08-29 实测）</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>许可证</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/Fields2Cover/Fields2Cover">Fields2Cover</a></td>
+<td>BSD-3-Clause</td>
+<td>农业方向，模块化，最活跃</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/nobleo/full_coverage_path_planner">nobleo/full_coverage_path_planner</a></td>
+<td>Apache-2.0</td>
+<td>BSA 螺旋，MBF 插件</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/ethz-asl/polygon_coverage_planning">ethz-asl/polygon_coverage_planning</a></td>
+<td>GPL-3.0</td>
+<td>BCD+GTSP，已停更</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/ipa320/ipa_coverage_planning">ipa320/ipa_coverage_planning</a></td>
+<td><strong>LGPL，商用需授权</strong></td>
+<td>8 种算法，含 FOV 模式</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/Greenzie/boustrophedon_planner">Greenzie/boustrophedon_planner</a></td>
+<td><strong>LGPL-3.0</strong></td>
+<td>接受多边形输入，代码简洁</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/open-navigation/opennav_coverage">open-navigation/opennav_coverage</a></td>
+<td>Apache-2.0</td>
+<td>ROS 2 / Nav2 生态</td>
+</tr>
+</tbody>
+</table>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%9C%BA%E5%99%A8%E4%BA%BA%E5%AD%A6/" class="category-chain-item">机器人学</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%9C%BA%E5%99%A8%E4%BA%BA%E5%AD%A6/%E5%AF%BC%E8%88%AA%E8%A7%84%E5%88%92/" class="category-chain-item">导航规划</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E8%A6%86%E7%9B%96%E5%BC%8F%E8%B7%AF%E5%BE%84%E8%A7%84%E5%88%92/" class="print-no-link">#覆盖式路径规划</a>
+      
+        <a href="/tags/%E5%8D%95%E5%85%83%E5%88%86%E8%A7%A3/" class="print-no-link">#单元分解</a>
+      
+        <a href="/tags/%E5%B7%A1%E6%A3%80/" class="print-no-link">#巡检</a>
+      
+        <a href="/tags/%E5%BC%80%E6%BA%90%E5%AE%9E%E7%8E%B0/" class="print-no-link">#开源实现</a>
+      
+        <a href="/tags/%E8%B0%83%E7%A0%94/" class="print-no-link">#调研</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>覆盖式路径规划调研</div>
+      <div>https://ethanyliang.github.io/2026/08/29/覆盖式路径规划调研/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>EthanYLiang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月29日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年10月14日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/10/13/%E8%A7%86%E8%A7%89%E8%AF%AD%E8%A8%80%E5%AF%BC%E8%88%AA%E7%BB%BC%E8%BF%B0-%E4%BB%8E%E4%BB%BB%E5%8A%A1%E8%AF%84%E6%B5%8B%E5%88%B0%E6%9C%BA%E5%99%A8%E4%BA%BA%E9%97%AD%E7%8E%AF/" title="视觉语言导航综述：从任务评测到机器人闭环">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">视觉语言导航综述：从任务评测到机器人闭环</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/26/%E8%BD%AE%E5%BC%8F%E6%9C%BA%E5%99%A8%E4%BA%BA%E7%9A%84%E5%85%A8%E5%B1%80%E8%B7%AF%E5%BE%84%E8%A7%84%E5%88%92%E8%B0%83%E7%A0%94/" title="轮式机器人的全局路径规划调研">
+                        <span class="hidden-mobile">轮式机器人的全局路径规划调研</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+    <div id="giscus" class="giscus"></div>
+    <script type="text/javascript">
+      Fluid.utils.loadComments('#giscus', function() {
+        var options = {"repo":"EthanYLiang/EthanYLiang.github.io","repo-id":"R_kgDOQj-08A","category":"Announcements","category-id":"DIC_kwDOQj-08M4Czfip","theme-light":"light","theme-dark":"dark","mapping":"pathname","reactions-enabled":1,"emit-metadata":0,"input-position":"top","lang":"zh-CN"};
+        var attributes = {};
+        for (let option in options) {
+          if (!option.startsWith('theme-')) {
+            var key = option.startsWith('data-') ? option : 'data-' + option;
+            attributes[key] = options[option];
+          }
+        }
+        var light = 'light';
+        var dark = 'dark';
+        window.GiscusThemeLight = light;
+        window.GiscusThemeDark = dark;
+        attributes['data-theme'] = document.documentElement.getAttribute('data-user-color-scheme') === 'dark' ? dark : light;
+        for (let attribute in attributes) {
+          var value = attributes[attribute];
+          if (value === undefined || value === null || value === '') {
+            delete attributes[attribute];
+          }
+        }
+        var s = document.createElement('script');
+        s.setAttribute('src', 'https://giscus.app/client.js');
+        s.setAttribute('crossorigin', 'anonymous');
+        for (let attribute in attributes) {
+          s.setAttribute(attribute, attributes[attribute]);
+        }
+        var ss = document.getElementsByTagName('script');
+        var e = ss.length > 0 ? ss[ss.length - 1] : document.head || document.documentElement;
+        e.parentNode.insertBefore(s, e.nextSibling);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+  <script>
+  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
+    mermaid.initialize({"theme":"default"});
+
+    Fluid.utils.listenDOMLoaded(function() {
+      Fluid.events.registerRefreshCallback(function() {
+        if ('mermaid' in window) {
+          mermaid.init();
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/openkounter.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

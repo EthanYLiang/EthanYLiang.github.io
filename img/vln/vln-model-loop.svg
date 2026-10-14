@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 570" role="img" aria-labelledby="title desc">
+<title id="title">VLN 在线决策数据流</title><desc id="desc">完整指令提供语言特征，当前观测提供视觉特征，与上一状态一起参与融合和动作预测。动作执行后产生下一次观测。</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10" fill="none" stroke="#87a3b9" stroke-width="1.7"/></marker>
+<marker id="observation-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10" fill="none" stroke="#5ed7ce" stroke-width="1.7"/></marker>
+<marker id="state-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10" fill="none" stroke="#c4baf1" stroke-width="1.7"/></marker>
+</defs>
+<rect width="960" height="570" rx="22" fill="#101d2d"/>
+<g font-family="Microsoft YaHei, Noto Sans SC, sans-serif" fill="#edf4fa">
+<text x="42" y="55" font-size="27" font-weight="700">一步决策，持续反馈</text>
+<text x="42" y="88" font-size="18" fill="#9db2c6">语言在开始时给定 · 视觉随行动更新</text>
+<g stroke="#334b62" stroke-width="1.5">
+<rect x="42" y="135" width="240" height="104" rx="14" fill="#17324a"/>
+<rect x="360" y="135" width="240" height="104" rx="14" fill="#123a3e"/>
+<rect x="678" y="135" width="240" height="104" rx="14" fill="#30314c"/>
+<rect x="280" y="310" width="400" height="95" rx="16" fill="#1c3348"/>
+<rect x="360" y="460" width="240" height="72" rx="14" fill="#3b3025"/>
+</g>
+<g text-anchor="middle" font-size="25" font-weight="600"><text x="162" y="176">完整指令</text><text x="480" y="176">当前观测</text><text x="798" y="176">上一内部状态</text><text x="480" y="349">读取与融合 → 动作分布</text><text x="480" y="505">选择并执行动作</text></g>
+<g text-anchor="middle" font-size="18" fill="#bacbd9"><text x="162" y="211">语言编码 / 词级特征</text><text x="480" y="211">视觉编码 / 方向特征</text><text x="798" y="211">摘要或历史序列</text><text x="480" y="382">只在当前合法动作中选择</text></g>
+<g fill="none" stroke="#87a3b9" stroke-width="2.5" marker-end="url(#arrow)"><path d="M162 239V270H360V307"/><path d="M480 239V307"/><path d="M798 239V270H600V307"/><path d="M480 405V457"/></g>
+<path d="M400 532V548H22V116H480V132" fill="none" stroke="#5ed7ce" stroke-width="2.5" marker-end="url(#observation-arrow)"/>
+<path d="M680 360H938V116H798V132" fill="none" stroke="#c4baf1" stroke-width="2.5" marker-end="url(#state-arrow)"/>
+<rect x="35" y="440" width="186" height="59" rx="10" fill="#101d2d"/>
+<text x="128" y="464" text-anchor="middle" font-size="19" fill="#5ed7ce">环境反馈</text><text x="128" y="489" text-anchor="middle" font-size="17" fill="#9db2c6">产生下一步观测</text>
+<text x="804" y="398" text-anchor="middle" font-size="18" fill="#c4baf1">更新历史 / 状态</text>
+</g></svg>

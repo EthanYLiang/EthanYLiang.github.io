@@ -1,0 +1,65 @@
+<?xml version="1.0" standalone="no"?>
+<svg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#38bdf8" stroke-width="0.5" opacity="0.2"/>
+    </pattern>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0"/>
+    </radialGradient>
+    <marker id="k" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7dd3fc"/>
+    </marker>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#0f172a"/>
+  <rect width="1920" height="1080" fill="url(#grid)"/>
+  <circle cx="1100" cy="540" r="620" fill="url(#glow)"/>
+
+  <!-- 瞬时旋转中心 ICR -->
+  <g stroke="#ec4899" fill="none">
+    <circle cx="430" cy="540" r="30" stroke-width="3.5" opacity="0.55"/>
+    <path d="M400,540 H460 M430,510 V570" stroke-width="3.5"/>
+  </g>
+
+  <!-- 内外侧转弯圆弧 -->
+  <g fill="none" stroke="#38bdf8" stroke-dasharray="16 12">
+    <path d="M430,540 m-0,-340 a340,340 0 1 1 0,680 a340,340 0 1 1 0,-680" stroke-width="2.5" opacity="0.35"/>
+    <path d="M430,540 m-0,-560 a560,560 0 1 1 0,1120 a560,560 0 1 1 0,-1120" stroke-width="2.5" opacity="0.28"/>
+  </g>
+
+  <!-- ICR 到两侧轮的连线 -->
+  <g stroke="#ec4899" stroke-width="2" opacity="0.45" stroke-dasharray="10 9">
+    <path d="M430,540 L1010,320"/>
+    <path d="M430,540 L1010,760"/>
+  </g>
+
+  <!-- 车体 -->
+  <g transform="translate(1010,540)">
+    <rect x="-150" y="-220" width="300" height="440" rx="34" fill="#1e293b" stroke="#38bdf8" stroke-width="3.5"/>
+    <rect x="-104" y="-160" width="208" height="320" rx="22" fill="none" stroke="#7dd3fc" stroke-width="1.5" opacity="0.4"/>
+    <circle cx="0" cy="0" r="13" fill="#7dd3fc"/>
+
+    <!-- 四个轮子，前轮转向一定角度 -->
+    <g fill="#0f172a" stroke="#e0f2fe" stroke-width="2.5">
+      <rect x="-24" y="-46" width="48" height="92" rx="14" transform="translate(-150,-220) rotate(-21)"/>
+      <rect x="-24" y="-46" width="48" height="92" rx="14" transform="translate(150,-220) rotate(-13)"/>
+      <rect x="-24" y="-46" width="48" height="92" rx="14" transform="translate(-150,220)"/>
+      <rect x="-24" y="-46" width="48" height="92" rx="14" transform="translate(150,220)"/>
+    </g>
+
+    <!-- 车体速度与角速度 -->
+    <path d="M0,0 L0,-330" stroke="#7dd3fc" stroke-width="6" stroke-linecap="round" marker-end="url(#k)"/>
+    <path d="M96,-250 A250,250 0 0 1 176,-178" fill="none" stroke="#ec4899" stroke-width="5.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- 左右轮速差示意 -->
+  <g stroke="#7dd3fc" stroke-width="5" stroke-linecap="round" marker-end="url(#k)" opacity="0.85">
+    <path d="M1180,760 L1180,650"/>
+    <path d="M840,760 L840,690"/>
+  </g>
+
+  <path d="M0,990 Q480,910 960,990 T1920,990" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.25"/>
+  <path d="M0,1010 Q480,930 960,1010 T1920,1010" fill="none" stroke="#ec4899" stroke-width="2" opacity="0.2"/>
+</svg>

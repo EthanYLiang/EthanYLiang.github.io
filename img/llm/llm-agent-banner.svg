@@ -1,0 +1,91 @@
+<?xml version="1.0" standalone="no"?>
+<svg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#38bdf8" stroke-width="0.5" opacity="0.2"/>
+    </pattern>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="core" cx="38%" cy="32%" r="72%">
+      <stop offset="0%" stop-color="#7dd3fc"/>
+      <stop offset="55%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </radialGradient>
+    <radialGradient id="nodeA" cx="38%" cy="32%" r="72%">
+      <stop offset="0%" stop-color="#a5f3fc"/>
+      <stop offset="100%" stop-color="#0e7490"/>
+    </radialGradient>
+    <radialGradient id="nodeB" cx="38%" cy="32%" r="72%">
+      <stop offset="0%" stop-color="#fbcfe8"/>
+      <stop offset="100%" stop-color="#be185d"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#0f172a"/>
+  <rect width="1920" height="1080" fill="url(#grid)"/>
+  <circle cx="960" cy="540" r="620" fill="url(#glow)" opacity="0.75"/>
+
+  <!-- 中枢与卫星智能体之间的连线 -->
+  <g stroke="#38bdf8" stroke-width="2.5" opacity="0.45" fill="none">
+    <path d="M960,540 L960,180"/>
+    <path d="M960,540 L1272,360"/>
+    <path d="M960,540 L1272,720"/>
+    <path d="M960,540 L960,900"/>
+    <path d="M960,540 L648,720"/>
+    <path d="M960,540 L648,360"/>
+  </g>
+
+  <!-- 卫星之间的协作弧线 -->
+  <g stroke="#ec4899" stroke-width="1.6" opacity="0.3" fill="none">
+    <path d="M960,180 Q1200,200 1272,360"/>
+    <path d="M1272,720 Q1160,900 960,900"/>
+    <path d="M648,720 Q560,540 648,360"/>
+  </g>
+
+  <!-- 中枢：大模型作为大脑 -->
+  <circle cx="960" cy="540" r="176" fill="none" stroke="#38bdf8" stroke-width="1.5" opacity="0.35"/>
+  <circle cx="960" cy="540" r="140" fill="none" stroke="#38bdf8" stroke-width="1.5" opacity="0.55"/>
+  <circle cx="960" cy="540" r="104" fill="url(#core)"/>
+  <circle cx="960" cy="540" r="104" fill="none" stroke="#e0f2fe" stroke-width="2" opacity="0.5"/>
+
+  <!-- 中枢内部的层结构，暗示多层网络 -->
+  <g stroke="#0f172a" stroke-width="3" opacity="0.35" fill="none">
+    <path d="M894,502 H1026"/>
+    <path d="M886,540 H1034"/>
+    <path d="M894,578 H1026"/>
+  </g>
+
+  <!-- 卫星智能体节点 -->
+  <g>
+    <circle cx="960" cy="180" r="46" fill="url(#nodeA)"/>
+    <circle cx="1272" cy="360" r="46" fill="url(#nodeB)"/>
+    <circle cx="1272" cy="720" r="46" fill="url(#nodeA)"/>
+    <circle cx="960" cy="900" r="46" fill="url(#nodeB)"/>
+    <circle cx="648" cy="720" r="46" fill="url(#nodeA)"/>
+    <circle cx="648" cy="360" r="46" fill="url(#nodeB)"/>
+  </g>
+  <g fill="none" stroke="#e0f2fe" stroke-width="1.5" opacity="0.4">
+    <circle cx="960" cy="180" r="46"/>
+    <circle cx="1272" cy="360" r="46"/>
+    <circle cx="1272" cy="720" r="46"/>
+    <circle cx="960" cy="900" r="46"/>
+    <circle cx="648" cy="720" r="46"/>
+    <circle cx="648" cy="360" r="46"/>
+  </g>
+
+  <!-- 沿连线流动的 token 点 -->
+  <g fill="#e0f2fe" opacity="0.85">
+    <circle cx="960" cy="300" r="6"/>
+    <circle cx="1168" cy="420" r="6"/>
+    <circle cx="1168" cy="660" r="6"/>
+    <circle cx="960" cy="780" r="6"/>
+    <circle cx="752" cy="660" r="6"/>
+    <circle cx="752" cy="420" r="6"/>
+  </g>
+
+  <!-- 与站点 banner 呼应的抽象波纹 -->
+  <path d="M0,980 Q480,900 960,980 T1920,980" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.3"/>
+  <path d="M0,1000 Q480,920 960,1000 T1920,1000" fill="none" stroke="#ec4899" stroke-width="2" opacity="0.22"/>
+</svg>

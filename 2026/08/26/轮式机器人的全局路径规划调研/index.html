@@ -1,0 +1,1606 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/bg/ely.png">
+  <link rel="icon" href="/img/bg/ely.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="EthanYLiang">
+  <meta name="keywords" content="SLAM,建图定位,多模态融合,融合感知,规划控制,VLN,视觉语言导航,具身智能,移动机器人,ROS">
+  
+    <meta name="description" content="轮式机器人（含轮式人形）在地面导航，本质是 2.5D 的全局路径规划问题。本文按地图 表示组织文献，覆盖 2D 栅格、2.5D 高程图、3D 体素、稀疏图与表面表示五条路线，梳理 各自的可通行性估计与规划方法、开源实现和适用边界；再顺着引文关系还原技术演进脉络, 最后给出选型建议和四个可能的研究方向。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="轮式机器人的全局路径规划调研">
+<meta property="og:url" content="https://ethanyliang.github.io/2026/08/26/%E8%BD%AE%E5%BC%8F%E6%9C%BA%E5%99%A8%E4%BA%BA%E7%9A%84%E5%85%A8%E5%B1%80%E8%B7%AF%E5%BE%84%E8%A7%84%E5%88%92%E8%B0%83%E7%A0%94/index.html">
+<meta property="og:site_name" content="EthanYLiang">
+<meta property="og:description" content="轮式机器人（含轮式人形）在地面导航，本质是 2.5D 的全局路径规划问题。本文按地图 表示组织文献，覆盖 2D 栅格、2.5D 高程图、3D 体素、稀疏图与表面表示五条路线，梳理 各自的可通行性估计与规划方法、开源实现和适用边界；再顺着引文关系还原技术演进脉络, 最后给出选型建议和四个可能的研究方向。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ethanyliang.github.io/img/plan/wheeled-global-planning-banner.svg">
+<meta property="article:published_time" content="2026-08-26T13:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-14T08:20:45.429Z">
+<meta property="article:author" content="EthanYLiang">
+<meta property="article:tag" content="3D激光雷达">
+<meta property="article:tag" content="全局路径规划">
+<meta property="article:tag" content="可通行性">
+<meta property="article:tag" content="调研">
+<meta property="article:tag" content="高程图">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://ethanyliang.github.io/img/plan/wheeled-global-planning-banner.svg">
+  
+  
+  
+  <title>轮式机器人的全局路径规划调研 - EthanYLiang</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/KaTeX/0.16.2/katex.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"ethanyliang.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"><link rel="alternate" href="/atom.xml" title="EthanYLiang" type="application/atom+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>EthanY&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/series/vln/" target="_self">
+                <i class="iconfont icon-book"></i>
+                <span>VLN 系列</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/atom.xml" target="_self">
+                
+                <span>RSS</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/series/vln/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-book"></i>
+                  <span>VLN 系列</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/atom.xml" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-link-fill"></i>
+                  <span>RSS</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/plan/wheeled-global-planning-banner.svg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="轮式机器人的全局路径规划调研"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-26 21:00" pubdate>
+          2026年8月26日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          16k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          133 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">轮式机器人的全局路径规划调研</h1>
+            
+            
+              <div class="markdown-body">
+                
+    
+                <blockquote>
+<p>轮式机器人（含轮式人形）在地面导航，本质是 2.5D 的全局路径规划问题。本文按地图
+表示组织文献，覆盖 2D 栅格、2.5D 高程图、3D 体素、稀疏图与表面表示五条路线，梳理
+各自的可通行性估计与规划方法、开源实现和适用边界；再顺着引文关系还原技术演进脉络,
+最后给出选型建议和四个可能的研究方向。</p>
+</blockquote>
+<span id="more"></span>
+<h2 id="一、调研概述">一、调研概述</h2>
+<h3 id="1-1-问题描述">1.1 问题描述</h3>
+<p>轮式人形机器人上半身再复杂，底盘仍然是轮式移动机器人：<strong>它只能在连续的地面上运
+动，不能像无人机那样在自由三维空间里穿行</strong>。所以它的全局路径规划不是 3D 问题，而
+是「在一张带高度信息的地面上找路」—— 也就是 2.5D。</p>
+<p>这个定位决定了后面所有的技术取舍。把它当自由 3D 问题做，会付出没必要的计算代价；
+当纯 2D 做，又会在坡道、门槛、台阶前失效。</p>
+<p>调研目标：<strong>为轮式机器人的全局路径规划方案设计提供选型依据</strong>，回答三个问题 ——
+在什么地图表示上规划、可通行性怎么算、用什么规划器。</p>
+<p>顺带一提，「轮式人形」这个关键词在 arXiv 上几乎搜不到导航规划的工作 —— 该方向
+当前的研究重心在上肢操作和全身控制，底盘导航被默认为已解决、直接复用轮式移动
+机器人方案。所以下文的调研对象是<strong>轮式机器人</strong>这个更大的类别。</p>
+<h3 id="1-2-背景知识">1.2 背景知识</h3>
+<p><strong>全局与局部的分工。</strong> 全局规划器在已知地图上算出从起点到终点的一条路径，关心的是
+连通性和总代价；局部规划器（或控制器）跟踪这条路径并处理未建图的动态障碍，关心的是
+运动学可行性和实时性。二者频率差一个数量级 —— 参考 <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2209.07252">2.5D 导航系统</a> 的配置：
+<strong>建图与全局规划约 1 Hz，局部跟踪约 10 Hz</strong>。</p>
+<p><strong>可通行性（traversability）</strong> 是这个领域的核心概念：不是二值的「有没有障碍」，而是
+「这块地形对这个机器人有多难走」。它至少包含坡度、粗糙度、机器人在该处的姿态三个
+维度，进阶的还会包含不确定性。这个概念是 2.5D 及以上所有方法的公共基础。</p>
+<p><strong>为什么 3D 激光的点云不能直接规划。</strong> <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2607.01454">SE(2) NavMesh</a> 讲得清楚：点云<strong>缺乏结构
+组织</strong>，几何表面和连通性都要靠额外处理去推断，在大场景下计算开销很大且容易出错。
+所以从传感器到规划器之间，必须插一层地图表示 —— 选哪一层就是本文的主线。</p>
+<h2 id="二、文献调研">二、文献调研</h2>
+<h3 id="2-1-地图表示：五类路线">2.1 地图表示：五类路线</h3>
+<p>全局规划的第一个决策不是选算法，而是<strong>选在什么表示上规划</strong>。</p>
+<pre><code class=" mermaid">flowchart TD
+    A[&quot;传感器数据&lt;br/&gt;3D 激光 / RGB-D&quot;] --&gt; B[&quot;2D 栅格&lt;br/&gt;占据/空闲&quot;]
+    A --&gt; C[&quot;2.5D 高程图&lt;br/&gt;每格一个高度&quot;]
+    A --&gt; D[&quot;3D 体素 / OctoMap&lt;br/&gt;完整三维占据&quot;]
+    A --&gt; E[&quot;表面表示&lt;br/&gt;网格 / NavMesh&quot;]
+    A --&gt; J[&quot;稀疏图&lt;br/&gt;TRG / 拓扑图&quot;]
+    D -.多层投影.-&gt; C
+    B --&gt; F[&quot;图搜索&lt;br/&gt;A* / Theta* / D* Lite&quot;]
+    C --&gt; G[&quot;带代价的图搜索&lt;br/&gt;通行性作权重&quot;]
+    D --&gt; H[&quot;3D 图搜索 / 采样&quot;]
+    E --&gt; I[&quot;多边形寻路&quot;]
+    J --&gt; K[&quot;图优化 / A*&quot;]
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>表示</th>
+<th>每格/节点存什么</th>
+<th>优点</th>
+<th>失效场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2D 栅格</td>
+<td>占据概率</td>
+<td>构建快、查询快、生态成熟</td>
+<td>坡道被判为障碍；分不清墙与可跨台阶</td>
+</tr>
+<tr>
+<td>2.5D 高程图</td>
+<td>高度、方差、法向量、粗糙度</td>
+<td>信息量与开销的平衡点</td>
+<td>单层，表达不了悬空物与多层结构</td>
+</tr>
+<tr>
+<td>3D 体素</td>
+<td>占据概率（八叉树）</td>
+<td>完整、支持多层</td>
+<td>存储大、查询慢</td>
+</tr>
+<tr>
+<td>表面 / NavMesh</td>
+<td>可通行多边形</td>
+<td>寻路极快</td>
+<td>构建复杂；经典实现假设通行性与朝向无关</td>
+</tr>
+<tr>
+<td>稀疏图 / TRG</td>
+<td>节点=稳定性与可达性</td>
+<td>大场景实时，天然带风险语义</td>
+<td>图的构建质量决定上限</td>
+</tr>
+</tbody>
+</table>
+<p>一个容易被忽略的事实：<strong>2.5D 不是 3D 的简化，而是一种针对地面运动的建模选择</strong>。
+对只能贴地运动的轮式底盘，「同一平面位置只有一个可站立高度」这个假设在绝大多数
+场景成立。</p>
+<h3 id="2-2-2D-栅格路线">2.2 2D 栅格路线</h3>
+<h4 id="主流实现">主流实现</h4>
+<p>ROS2 的 <a target="_blank" rel="noopener" href="https://docs.nav2.org/configuration/packages/configuring-smac-planner.html">Nav2</a> 提供了一整套成熟的 2D 全局规划器：</p>
+<table>
+<thead>
+<tr>
+<th>规划器</th>
+<th>搜索空间</th>
+<th>适用平台</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NavFn</td>
+<td>2D 栅格，Dijkstra/A*</td>
+<td>通用，最经典</td>
+</tr>
+<tr>
+<td>Smac 2D</td>
+<td>2D 栅格，优化过的 A*</td>
+<td>通用</td>
+</tr>
+<tr>
+<td><strong>Smac Hybrid-A*</strong></td>
+<td><strong>SE(2)</strong>，Dubins / Reeds-Shepp</td>
+<td>阿克曼、类车</td>
+</tr>
+<tr>
+<td><strong>Smac State Lattice</strong></td>
+<td>状态格</td>
+<td><strong>差速与全向</strong></td>
+</tr>
+</tbody>
+</table>
+<p>对轮式人形这类差速或全向底盘，<code>SmacPlannerLattice</code> 通常比 Hybrid-A* 更合适 ——
+后者的 Dubins/Reeds-Shepp 模型是为转弯半径受限的类车平台设计的。两者都保证路径
+<strong>运动学可行</strong>。注意一个差异：Hybrid-A* 支持路径平滑，State Lattice 不支持（格点
+依赖代价地图分辨率）。</p>
+<p>经典算法层面还有 <strong>Theta*</strong>（any-angle，路径不受栅格八方向约束）、<strong>D* Lite</strong>
+（增量式重规划，适合地图局部更新）和 <strong>JPS</strong>（Jump Point Search，在均匀代价栅格上
+跳过对称路径，大幅减少扩展节点数）。<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2406.13910">A-OctoMap</a> 就是在 JPS 上做的改进。</p>
+<h4 id="失效边界">失效边界</h4>
+<p><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2303.05304">T-Hybrid A*</a> 给了个有说服力的量化结果：火星地形数据集上 50 组随机起终点实验，
+<strong>2D 地图规划出的路径有一半无法被安全跟踪</strong> —— 部分路径点的地形粗糙度或机器人投影
+姿态超出安全阈值。</p>
+<p>室内失效更具体，<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2209.07252">2.5D 导航系统</a> 列举得清楚：坡道、楼梯、路沿、粗糙地面、路上的
+杂物 —— <strong>这些对机器人可能可通行，但在 2D 栅格上一律被标成障碍</strong>。</p>
+<p><strong>结论：如果场景是平整地面加静态障碍，2D 栅格 + Nav2 就是正确答案</strong>，不要过度设计。</p>
+<h3 id="2-3-2-5D-高程图路线（重点）">2.3 2.5D 高程图路线（重点）</h3>
+<p>这是轮式机器人最主流的一路。链路分三段：<strong>建图 → 算可通行性 → 在其上规划</strong>。</p>
+<h4 id="2-3-1-建图">2.3.1 建图</h4>
+<p>事实标准是 ETH / ANYbotics 这套，三篇论文对应三代实现：</p>
+<ul>
+<li><strong><a target="_blank" rel="noopener" href="https://doi.org/10.1109/LRA.2018.2849506">Fankhauser 等 2018</a></strong>「Probabilistic Terrain Mapping for Mobile Robots
+With Uncertain Localization」—— 这是 <code>elevation_mapping</code> 的论文。机器人中心的高程
+图，卡尔曼滤波融合位姿与距离传感器，再做基于邻域的概率融合，每格维护<strong>高度和方差</strong>。
+维护方差这点很关键，它是后续做不确定性感知的前提。</li>
+<li><strong><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2204.12876">Miki 等 2022</a></strong>「Elevation Mapping for Locomotion and Navigation using
+GPU」—— 这是 <code>elevation_mapping_cupy</code> 的论文。GPU 加速之外，三个关键增强：
+<strong>高度漂移补偿</strong>（对抗状态估计漂移造成的伪影）、<strong>基于光线投射的可见性清理</strong>
+（去除虚假体素，并<strong>正确处理悬空障碍</strong>）、<strong>学习式可通行性滤波器</strong>。</li>
+<li><strong><a target="_blank" rel="noopener" href="https://doi.org/10.1109/IROS.2016.7759199">Wermelinger 等 2016</a></strong>「Navigation planning for legged robots in
+challenging terrain」—— <code>traversability_estimation</code> 的方法论来源。</li>
+</ul>
+<p>那条「可见性清理正确处理悬空障碍」值得记 —— 它部分缓解了 2.5D 表达不了悬空物的固有
+短板。</p>
+<p><strong>一个实机必踩的坑</strong>，<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2209.07252">2.5D 导航系统</a> 专门提到：RGB-D 相机通常<strong>看不到机器人
+正下方和正前方</strong>，启动时机器人站在未建图的空洞里，跟踪器无法工作。解法是按机器人
+位姿和坡度<strong>主动填充足迹范围内的空格</strong>，初始化阶段用较大半径（0.4 m），完成后收到
+较小半径（0.25 m）补偶发空洞。</p>
+<h4 id="2-3-2-可通行性估计">2.3.2 可通行性估计</h4>
+<p>这是 2.5D 的核心，也是各家差异最大的地方。四种思路，复杂度递增。</p>
+<p><strong>思路一：高度差分（最轻量）</strong></p>
+<p><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2209.07252">2.5D 导航系统</a> 的公式，沿横纵两向取间隔 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi></mrow><annotation encoding="application/x-tex">\Delta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">Δ</span></span></span></span> 的高度差估坡度，映射成概率：</p>
+<p class="katex-block math-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>S</mi><mi>h</mi></msub><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∣</mi><mi>z</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo>+</mo><mi mathvariant="normal">Δ</mi><mo stretchy="false">)</mo><mo>−</mo><mi>z</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo>−</mo><mi mathvariant="normal">Δ</mi><mo stretchy="false">)</mo><mi mathvariant="normal">∣</mi></mrow><mrow><mn>2</mn><mi mathvariant="normal">Δ</mi><mi>ε</mi></mrow></mfrac><mo separator="true">,</mo><mspace width="1em"/><msub><mi>S</mi><mi>v</mi></msub><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><mi mathvariant="normal">∣</mi><mi>z</mi><mo stretchy="false">(</mo><mi>i</mi><mo>+</mo><mi mathvariant="normal">Δ</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo><mo>−</mo><mi>z</mi><mo stretchy="false">(</mo><mi>i</mi><mo>−</mo><mi mathvariant="normal">Δ</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo><mi mathvariant="normal">∣</mi></mrow><mrow><mn>2</mn><mi mathvariant="normal">Δ</mi><mi>ε</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">S_h(i,j) = \frac{|z(i,j+\Delta) - z(i,j-\Delta)|}{2\Delta\varepsilon}, \quad
+S_v(i,j) = \frac{|z(i+\Delta,j) - z(i-\Delta,j)|}{2\Delta\varepsilon}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.113em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2Δ</span><span class="mord mathnormal">ε</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">Δ</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">Δ</span><span class="mclose">)</span><span class="mord">∣</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.113em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2Δ</span><span class="mord mathnormal">ε</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">Δ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">Δ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mclose">)</span><span class="mord">∣</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p class="katex-block math-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>S</mi><mo>=</mo><mfrac><mrow><msub><mi>S</mi><mi>h</mi></msub><mo>+</mo><msub><mi>S</mi><mi>v</mi></msub></mrow><mn>2</mn></mfrac><mo separator="true">,</mo><mspace width="1em"/><mi>p</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi><mi>S</mi><mo stretchy="false">(</mo><mi>i</mi><mo separator="true">,</mo><mi>j</mi><mo stretchy="false">)</mo></mrow></msup></mrow><annotation encoding="application/x-tex">S = \frac{S_h + S_v}{2}, \quad p(i,j) = e^{-\lambda S(i,j)}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">v</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.938em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.938em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathnormal mtight">λ</span><span class="mord mathnormal mtight" style="margin-right:0.05764em;">S</span><span class="mopen mtight">(</span><span class="mord mathnormal mtight">i</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span><span class="mclose mtight">)</span></span></span></span></span></span></span></span></span></span></span></span></span></p>
+<p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>&gt;</mo><mn>0.5</mn></mrow><annotation encoding="application/x-tex">p &gt; 0.5</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7335em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0.5</span></span></span></span> 判可通行。只有 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi></mrow><annotation encoding="application/x-tex">\Delta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">Δ</span></span></span></span> 和 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi></mrow><annotation encoding="application/x-tex">\lambda</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span></span></span></span> 两个参数，标定简单，适合算力紧张的
+平台。</p>
+<p><strong>思路二：局部平面拟合（最主流）</strong></p>
+<p>足迹范围内最小二乘拟合平面 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mi>x</mi><mo>+</mo><mi>b</mi><mi>y</mi><mo>+</mo><mi>c</mi><mo>=</mo><mi>z</mi></mrow><annotation encoding="application/x-tex">ax + by + c = z</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">a</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">b</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span></span></span></span>，坡度由法向量与竖直方向夹角得到，
+粗糙度取各点到平面距离的标准差：</p>
+<p class="katex-block math-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>S</mi><mrow><mi>s</mi><mi>l</mi><mi>o</mi><mi>p</mi><mi>e</mi></mrow></msub><mo>=</mo><mi>arccos</mi><mo>⁡</mo><mrow><mo fence="true">(</mo><mfrac><mrow><mo stretchy="false">(</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo separator="true">,</mo><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo>⋅</mo><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><msqrt><mrow><msup><mi>a</mi><mn>2</mn></msup><mo>+</mo><msup><mi>b</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn></mrow></msqrt></mfrac><mo fence="true">)</mo></mrow><mo separator="true">,</mo><mspace width="1em"/><mi>σ</mi><mo>=</mo><msqrt><mrow><mfrac><mn>1</mn><mrow><mi mathvariant="normal">∣</mi><mi mathvariant="script">B</mi><mi mathvariant="normal">∣</mi></mrow></mfrac><munder><mo>∑</mo><mi>j</mi></munder><mfrac><mrow><mo stretchy="false">(</mo><mi>a</mi><msub><mi>x</mi><mi>j</mi></msub><mo>+</mo><mi>b</mi><msub><mi>y</mi><mi>j</mi></msub><mo>+</mo><mi>c</mi><mo>−</mo><msub><mi>z</mi><mi>j</mi></msub><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow><mrow><msup><mi>a</mi><mn>2</mn></msup><mo>+</mo><msup><mi>b</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn></mrow></mfrac></mrow></msqrt></mrow><annotation encoding="application/x-tex">S_{slope} = \arccos\left(\frac{(a, b, -1) \cdot (0,0,1)}{\sqrt{a^2+b^2+1}}\right), \quad
+\sigma = \sqrt{\frac{1}{|\mathcal{B}|}\sum_j \frac{(a x_j + b y_j + c - z_j)^2}{a^2+b^2+1}}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">s</span><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span><span class="mord mathnormal mtight">o</span><span class="mord mathnormal mtight">p</span><span class="mord mathnormal mtight">e</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.4em;vertical-align:-0.95em;"></span><span class="mop">arccos</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">(</span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.1966em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9134em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span></span></span><span style="top:-2.8734em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1266em;"><span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">−</span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mopen">(</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.93em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">)</span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3.0685em;vertical-align:-1.4138em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6547em;"><span class="svg-align" style="top:-5.0285em;"><span class="pstrut" style="height:5.0285em;"></span><span class="mord" style="padding-left:1.056em;"><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">∣</span><span class="mord mathcal" style="margin-right:0.03041em;">B</span><span class="mord">∣</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.4138em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">1</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">b</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">c</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span><span style="top:-3.6148em;"><span class="pstrut" style="height:5.0285em;"></span><span class="hide-tail" style="min-width:0.742em;height:3.1085em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="3.1085em" viewBox="0 0 400000 3108" preserveAspectRatio="xMinYMin slice"><path d="M702 80H40000040
+H742v2974l-4 4-4 4c-.667.7 -2 1.5-4 2.5s-4.167 1.833-6.5 2.5-5.5 1-9.5 1
+h-12l-28-84c-16.667-52-96.667 -294.333-240-727l-212 -643 -85 170
+c-4-3.333-8.333-7.667-13 -13l-13-13l77-155 77-156c66 199.333 139 419.667
+219 661 l218 661zM702 80H400000v40H742z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.4138em;"><span></span></span></span></span></span></span></span></span></span></p>
+<p><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2303.05304">T-Hybrid A*</a> 用 PCA 取最小特征向量作法向量，本质相同。它还额外算点到拟合平面的
+<strong>有符号距离极差</strong> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>=</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>i</mi></msub><mo stretchy="false">(</mo><msub><mi>d</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo>−</mo><msub><mrow><mi>min</mi><mo>⁡</mo></mrow><mi>j</mi></msub><mo stretchy="false">(</mo><msub><mi>d</mi><mi>j</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">h = \max_i(d_i) - \min_j(d_j)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">h</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span class="mop">max</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mop"><span class="mop">min</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> —— <strong>有符号是关键</strong>，这样凹坑和
+凸起都能检出，绝对值会把两者混为一谈。</p>
+<p><strong>思路三：把机器人姿态算进去</strong></p>
+<p>前两种算的是「地形本身好不好走」，但真正决定安全的是<strong>机器人以某个朝向停在该处时的
+姿态</strong>。<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2303.05304">T-Hybrid A*</a> 规划时实时把机器人投影到局部平面，解出真实 roll 和 pitch：</p>
+<p class="katex-block math-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mover accent="true"><mi>τ</mi><mo>~</mo></mover><mo>=</mo><mn>1</mn><mo>−</mo><msub><mi>w</mi><mi>r</mi></msub><mfrac><msub><mi>r</mi><mrow><mi>s</mi><mi>u</mi><mi>m</mi></mrow></msub><msub><mi>r</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub></mfrac><mo>−</mo><msub><mi>w</mi><mrow><mi>θ</mi><mi>x</mi></mrow></msub><mfrac><mrow><mi mathvariant="normal">∣</mi><msub><mi>θ</mi><mi>x</mi></msub><mi mathvariant="normal">∣</mi></mrow><msub><mi>θ</mi><mrow><mi>x</mi><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub></mfrac><mo>−</mo><msub><mi>w</mi><mrow><mi>θ</mi><mi>y</mi></mrow></msub><mi>max</mi><mo>⁡</mo><mrow><mo fence="true">(</mo><mfrac><msub><mi>θ</mi><mi>y</mi></msub><msub><mi>θ</mi><mrow><mi>y</mi><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub></mfrac><mo separator="true">,</mo><mfrac><msub><mi>θ</mi><mi>y</mi></msub><msub><mi>θ</mi><mrow><mi>y</mi><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub></mfrac><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">\tilde{\tau} = 1 - w_r \frac{r_{sum}}{r_{max}}
+- w_{\theta x} \frac{|\theta_x|}{\theta_{xmax}}
+- w_{\theta y} \max\left(\frac{\theta_y}{\theta_{ymin}}, \frac{\theta_y}{\theta_{ymax}}\right)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6679em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2222em;"><span class="mord">~</span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.9436em;vertical-align:-0.836em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1076em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">ma</span><span class="mord mathnormal mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">s</span><span class="mord mathnormal mtight">u</span><span class="mord mathnormal mtight">m</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.263em;vertical-align:-0.836em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">θ</span><span class="mord mathnormal mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.427em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">x</span><span class="mord mathnormal mtight">ma</span><span class="mord mathnormal mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">∣</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">x</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.836em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.4221em;vertical-align:-0.9721em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">θ</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">max</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">(</span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span><span class="mord mathnormal mtight">min</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9721em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span><span class="mord mathnormal mtight">ma</span><span class="mord mathnormal mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9721em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">)</span></span></span></span></span></span></span></p>
+<p>注意 pitch 用了<strong>两个不对称阈值</strong> —— 上坡和下坡的安全裕度本来就不同。对重心高的
+平台，这个不对称只会更明显。</p>
+<p><strong>思路四：把不确定性和风险算进去</strong></p>
+<p>前三种都把可通行性当确定值。但地图本身有噪声，感知退化场景尤甚。<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2303.01614">STEP</a>（DARPA
+地下挑战赛）给出另一套框架：<strong>不确定性感知的建图与可通行性评估</strong>，用<strong>条件风险价值
+（CVaR）做尾部风险评估</strong> —— 关注的不是平均有多难走，而是最坏那部分有多糟。配合风险
+感知 MPC 与快速恢复行为，在洞穴、矿井、隧道做了轮式和腿式平台的实地验证。</p>
+<p>对轮式人形这个视角值得重视：<strong>重心高的平台，一次翻倒的代价远高于多绕十米</strong>，用均值
+代价优化本身就是错配。</p>
+<p><strong>一个容易整体遗漏的类别：负障碍。</strong> 上面讨论的都是正障碍（凸起、坡、墙），但坑洞、
+台阶下沿、装卸口这类<strong>负障碍</strong>感知上更难 —— 激光打不到坑底就没有回波，表现为<strong>数据
+缺失而非障碍</strong>。<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2010.16018">Hines 等</a> 用虚拟表面加姿态感知的规划与行为处理。</p>
+<p><strong>综述</strong>：针对地面车辆最对口的是 <a target="_blank" rel="noopener" href="https://doi.org/10.55417/fr.2022049">Borges 等 2022</a>（方法、传感器与挑战），另有
+<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2204.10883">可通行性估计综述</a> 和<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2312.16839">地面分割与可通行性估计综述</a>。</p>
+<h4 id="2-3-3-在高程图上规划">2.3.3 在高程图上规划</h4>
+<p><strong>路线 A：把通行性喂给现成的 2D 规划器。</strong> <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2209.07252">2.5D 导航系统</a> 最省事：把逐格通行性
+概率<strong>写进 Nav2 代价地图</strong>，直接用现成规划器（他们用 Theta*），局部跟踪用 MPPI。</p>
+<p>他们对比两种 MPPI 代价函数的结论有意思：<code>Slope-Roughness</code> 路径更短但会贴着悬崖走；
+<code>Slope-Traversability</code> 离边缘更远更保守但会直接开过小坑。<strong>没有绝对更好，取决于你的
+失败代价是翻车还是颠簸。</strong></p>
+<p><strong>路线 B：专门的地形感知规划器。</strong> <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2303.05304">T-Hybrid A*</a> <strong>分层混合</strong> —— 绝对不可通行区
+只用 2D 表示、规划时跳过；其余区域才建 2.5D 做完整姿态评估。点云分割用<strong>动态体素
+栅格</strong>，尺寸按机器人算：</p>
+<p class="katex-block math-block"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>G</mi><mi>l</mi></msub><mo>=</mo><msub><mi>G</mi><mi>w</mi></msub><mo>=</mo><msqrt><mrow><msubsup><mi>R</mi><mi>l</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>R</mi><mi>w</mi><mn>2</mn></msubsup></mrow></msqrt><mo separator="true">,</mo><mspace width="1em"/><msub><mi>G</mi><mi>h</mi></msub><mo>=</mo><msub><mi>G</mi><mi>l</mi></msub><mi>tan</mi><mo>⁡</mo><msub><mi>ρ</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub></mrow><annotation encoding="application/x-tex">G_l = G_w = \sqrt{R_l^2 + R_w^2}, \quad G_h = G_l \tan\rho_{max}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">G</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">G</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02691em;">w</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.84em;vertical-align:-0.5588em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.2812em;"><span class="svg-align" style="top:-3.8em;"><span class="pstrut" style="height:3.8em;"></span><span class="mord" style="padding-left:1em;"><span class="mord"><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7959em;"><span style="top:-2.3987em;margin-left:-0.0077em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span><span style="top:-3.0448em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3013em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.453em;margin-left:-0.0077em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02691em;">w</span></span></span><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.2412em;"><span class="pstrut" style="height:3.8em;"></span><span class="hide-tail" style="min-width:1.02em;height:1.88em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.88em" viewBox="0 0 400000 1944" preserveAspectRatio="xMinYMin slice"><path d="M983 90
+l0 -0
+c4,-6.7,10,-10,18,-10 H400000v40
+H1013.1s-83.4,268,-264.1,840c-180.7,572,-277,876.3,-289,913c-4.7,4.7,-12.7,7,-24,7
+s-12,0,-12,0c-1.3,-3.3,-3.7,-11.7,-7,-25c-35.3,-125.3,-106.7,-373.3,-214,-744
+c-10,12,-21,25,-33,39s-32,39,-32,39c-6,-5.3,-15,-14,-27,-26s25,-30,25,-30
+c26.7,-32.7,52,-63,76,-91s52,-60,52,-60s208,722,208,722
+c56,-175.3,126.3,-397.3,211,-666c84.7,-268.7,153.8,-488.2,207.5,-658.5
+c53.7,-170.3,84.5,-266.8,92.5,-289.5z
+M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.5588em;"><span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">G</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">G</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">tan</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">ρ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">ma</span><span class="mord mathnormal mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+<p>高度取 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>G</mi><mi>h</mi></msub></mrow><annotation encoding="application/x-tex">G_h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">G</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 后，树木桥梁这类悬空结构自然落在栅格外 —— 一个几何约束同时完成降采样和
+悬空物过滤。实机（0.7×0.5×0.5 m，Velodyne-16，最大坡度 20°）长坡场景 roll cost 从纯
+2.5D 的 537 降到 464。</p>
+<h4 id="2-3-4-2-5D-的硬边界">2.3.4 2.5D 的硬边界</h4>
+<p>三条，都无法靠调参绕过：</p>
+<ol>
+<li><strong>悬空结构</strong>——每格一个高度，桌子货架门框横梁表达不了；</li>
+<li><strong>多层重叠</strong>——天桥、楼梯间、多层厂房，同一平面位置有多个可站立高度；</li>
+<li><strong>矮小物体误判</strong>——纯几何下，线缆、地垫容易被当成地面起伏。</li>
+</ol>
+<p>碰到前两条就该往 2.4 走。</p>
+<h3 id="2-4-3D-体素与多层结构">2.4 3D 体素与多层结构</h3>
+<h4 id="投影法：3D-建图，2-5D-规划">投影法：3D 建图，2.5D 规划</h4>
+<p>性价比最高的折中，<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1710.10523">室内不平整环境导航</a> 是典型。流程：轮式里程计 + 2D 激光 +
+RGB-D 建 <strong>3D OctoMap</strong> → <strong>投影出多层 2D 占据图</strong> → <strong>按层间高度差生成可通行图</strong> →
+变步长 RRT 规划。</p>
+<p>它的场景设定对室内轮式机器人特别贴切：<strong>现代室内环境大多按无障碍标准设计</strong>，因此
+轮式机器人可以走坡道、同时避开楼梯。这直接决定了可通行性判据 —— 不是「地面平不平」，
+而是「这个坡度轮式底盘能不能上」。</p>
+<p><strong>投影法的价值：建图阶段保留完整 3D 信息（悬空物和多层都在），规划阶段投影到 2.5D
+（开销可控）。</strong></p>
+<h4 id="直接在多层结构上规划">直接在多层结构上规划</h4>
+<p>多层是常态时，<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2504.21622">多层点云加权可通行图</a> 更彻底：点云用<strong>多层跳表结构</strong>加瘦身算法
+组织；<strong>直接通过车体与点云交互分析</strong>取通行性指标，跳过曲面拟合；指标赋到多层连通图
+得到加权可通行图，改造 A* 搜索。</p>
+<p>OctoMap 效率优化：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2406.13910">A-OctoMap</a> 自适应分辨率下采样，<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2603.22508">Parallel OctoMapping</a>
+并行化。</p>
+<h3 id="2-5-稀疏图与表面表示">2.5 稀疏图与表面表示</h3>
+<p>这一类的共同点是<strong>把稠密栅格压缩成稀疏结构</strong>，用空间换时间。</p>
+<h4 id="TRG-系列：风险图（对轮式平台最相关）">TRG 系列：风险图（对轮式平台最相关）</h4>
+<p><strong><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2501.01806">TRG-Planner</a></strong>（RA-L 2025）提出<strong>可通行风险图（TRG）</strong>：节点表示地形的<strong>稳定
+性与可达性</strong>，边表示<strong>相对通行风险加权的候选路径</strong>。用<strong>波前传播</strong>方式构建、分层管理,
+因此大场景也能实时规划。最后在 TRG 上做图优化，同时优先安全和短距离。四足实机验证,
+是 DreamSTEP 队在 ICRA 2023 Quadruped Robot Challenge 夺冠方案的全局规划器。</p>
+<p><strong><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2608.16433">RB-TRG</a></strong>（2026-08）是本文调研到的<strong>最贴近轮式人形平台</strong>的工作，实机 Go2-W
+轮式四足。它指出原生 TRG 的代价是在<strong>圆形邻域</strong>和沿边地形区域上算的，而非机器人
+<strong>有朝向的机体足迹</strong> —— 对轮式腿式平台会漏掉<strong>部分支撑丧失</strong>和<strong>机体与地形干涉</strong>，
+转弯时尤其明显。</p>
+<p>做法：沿图的边和 <strong>yaw 扫掠</strong>采样有向矩形足迹，度量纵向支撑变化、侧向倾斜、地形干涉、
+以及<strong>对不可信地图区域的暴露</strong>；把这些量的<strong>均值与上尾特征</strong>并入转移代价，A* 在有序
+节点对状态上最小化。关键是它<strong>保留了 TRG 的构建过程和规划接口</strong>，是增强而非另起炉灶。</p>
+<p>结果：<strong>端到端成功率 51.5% → 68.5%，平均路径长度增加 2.3%</strong>。这个交换比很说明问题 ——
+多走 2.3% 的路换 17 个百分点的成功率。拿了 IEEE ICRA 2026 Legged Robot Challenges
+最佳自主与最佳机动奖。</p>
+<p>注意它和 STEP 的呼应：<strong>「对不可信地图区域的暴露」和「上尾特征」本质都是风险感知</strong>，
+不是平均代价优化。两条独立线索收敛到同一思路。</p>
+<h4 id="SE-2-NavMesh：朝向相关的多边形表示">SE(2) NavMesh：朝向相关的多边形表示</h4>
+<p><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2607.01454">SE(2) NavMesh</a>（ETH RSL，2026-07）把可通行区域抽象成<strong>连通凸多边形</strong>。经典
+NavMesh 假设<strong>通行性与朝向无关</strong>，对非圆形机体失效。它用<strong>足迹掩膜</strong>评估通行性并按
+yaw 离散成多层，层内平移连通、层间原地旋转连通。</p>
+<p>规划用三阶段 <strong>ASA（A* → String Pulling → A*）</strong>：yaw 分层图上搜可行路径与区域序列
+→ 丢弃 yaw 信息合并区域得多边形走廊、走廊内几何拉直 → 拉直位置上二次搜索优化朝向。</p>
+<p>结果：比经典 NavMesh <strong>多捕获 50% 以上可通行面积</strong>，ASA 再降 6.2% 路径长度。实机通过
+<strong>0.8 m 宽通道 —— 只比机体宽 0.27 m</strong>。</p>
+<p>它自承的局限对轮式人形恰是机会：<strong>只考虑固定机体高度</strong>，「降低高度就能过」的区域被
+误判为不可通行。很多轮式人形能调整躯干高度，把高度作为额外离散维度加入是自然扩展。</p>
+<p>同类还有 <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2606.19555">SCAN-Planner</a> 的<strong>朝向相关双圆柱足迹</strong>与<strong>投影 A* 加 z 梯度抑制</strong> ——
+避障主要在水平方向变形，保持斜坡楼梯上的垂直趋势。以及 <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2303.01420">ArtPlanner</a>，
+traversability 引导的采样加 MPC，面向野外腿式机器人。</p>
+<h4 id="拓扑图：更高层的抽象">拓扑图：更高层的抽象</h4>
+<p>再往上还有一层本文未展开的表示：<strong>分层语义拓扑图</strong>。<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2309.04791">osmAG</a> 用 OSM 格式表达
+分层的语义区域图（房间、走廊、连接关系），适合建筑尺度的粗粒度路径规划，再由下层
+几何规划器细化。这条路线和上面几种是互补关系而非竞争。</p>
+<h3 id="2-6-横切主题：动态环境下的重规划">2.6 横切主题：动态环境下的重规划</h3>
+<p>上面绝大多数工作假设全局地图静态、规划一次然后跟踪。但轮式人形的作业场景（商场、
+办公、家庭）高度动态。</p>
+<p>这个方向本文覆盖不足，只找到一条明确线索：<a target="_blank" rel="noopener" href="https://doi.org/10.1109/LRA.2023.3313052">De Luca 等 2023</a>「Autonomous
+Navigation With Online Replanning and Recovery Behaviors for Wheeled-Legged Robots
+Using Behavior Trees」—— 用<strong>行为树</strong>组织在线重规划与恢复行为，平台正是轮式腿式
+机器人。行为树在这里的作用是把「什么时候该重规划、重规划失败怎么办」这类控制流从
+规划器里剥离出来显式建模。</p>
+<p>结合 D* Lite 这类增量式重规划算法，是值得单独展开的方向。</p>
+<h3 id="2-7-最新进展（2026-年）">2.7 最新进展（2026 年）</h3>
+<p>把 2026 年 4 月之后的工作单独拎出来看，会发现三条清晰的趋势线。</p>
+<h4 id="趋势一：把全局规划推到传感器视距之外">趋势一：把全局规划推到传感器视距之外</h4>
+<p>这是今年最集中的方向。核心矛盾是：<strong>车载传感器只能看到周边几十米，但安全高效的
+路线取决于视距之外的地形特征</strong>，纯靠局部感知的全局规划必然近视。</p>
+<p><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2607.23743">Viswanath 等 2026</a> 的做法是从<strong>俯视数据</strong>（卫星影像、航空激光、矢量地图）学习
+连续的可通行性图，监督信号直接来自<strong>人类驾驶的 GPS 轨迹</strong>，再用激光的自监督几何
+先验做约束。他们同时公开了一个 299 场景、约 1244 km² 地形配 1130 km 人类驾驶数据的
+数据集（<a target="_blank" rel="noopener" href="https://huggingface.co/datasets/anony-008/offroad-global-nav">HuggingFace</a>）。实车结果：路径长度在人类路径的 3.66% 以内，
+<strong>操作员干预次数比纯局部规划方案减少约 85%</strong>。</p>
+<p><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2607.17984">Sivaprakasam 等 2026</a>（CMU）走的是<strong>蒸馏全局可通行性先验</strong>到图像 affordance
+预测，同样针对长时程下的近视行为。<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2608.17038">Singh 等 2026</a> 则更直接：把低分辨率的全局
+DEM 与实时传感器反馈做混合，弥补「全局建图与实时感知脱节」的问题。</p>
+<p><strong>对室内轮式平台的启发</strong>：室内没有卫星影像，但<strong>建筑 BIM 图纸、楼层平面图</strong>是等价的
+俯视先验。这条路线的思想可以迁移，数据源要换。</p>
+<h4 id="趋势二：风险建模从「加权代价」走向「概率融合」">趋势二：风险建模从「加权代价」走向「概率融合」</h4>
+<p><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2303.01614">STEP</a> 在 2021 年引入 CVaR 尾部风险，<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2608.16433">RB-TRG</a> 在 2026 年用上尾特征，
+两条独立线索已经收敛。今年又出现了第三条：</p>
+<p><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2607.13497">Genua 等 2026</a> 面向<strong>自主轮椅</strong>的分层风险图，把四类异质风险 —— 地形坡度、静态
+障碍、动态障碍、语义可通行性 —— 用 <strong>Noisy-OR 融合模型</strong>合成统一的概率代价面。这个
+选择值得注意：Noisy-OR 假设各风险源独立地「导致失败」，比线性加权更符合安全语义。
+配对蒙特卡洛评估中，<strong>碰撞率从 73% 以上降到 32% 以下，障碍物间距翻倍</strong>，并在商用
+电动轮椅上做了室内外三种任务剖面的验证。</p>
+<p>电动轮椅在运动学和安全约束上与轮式人形高度相似，这篇的参考价值比多数越野工作更高。</p>
+<p>另有 <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2608.17703">Arief 等 2026</a> 从理论侧切入：在<strong>真实通行代价先验未知、驱动不完美</strong>的前提
+下，把 Dijkstra 当作 oracle 解在线随机最短路问题，并给出可证明的保证。这类工作填的是
+「代价函数本身不确定时该怎么规划」的空白。</p>
+<h4 id="趋势三：跨本体的可迁移性成为显式问题">趋势三：跨本体的可迁移性成为显式问题</h4>
+<p><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2608.06688">Wang 等 2026</a> 提出的问题很尖锐：<strong>对一个机器人语义上合理的路径，对另一个机器人
+可能物理上不可行</strong>。他们用 VLA 模型提供语义先验，再用轨迹残差适配特定本体的移动性
+约束。</p>
+<p>这正好呼应本文反复提到的一点 —— 同一套可通行性公式，换个平台语义可能完全不同。
+过去这被当作调参问题，现在开始被当作<strong>建模问题</strong>处理。</p>
+<h2 id="三、开源项目">三、开源项目</h2>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>层次</th>
+<th>对应论文</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/ANYbotics/grid_map">grid_map</a></td>
+<td>基础库</td>
+<td>—</td>
+<td>多层二维栅格地图，2.5D 方案的底座</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/ANYbotics/elevation_mapping">elevation_mapping</a></td>
+<td>建图</td>
+<td><a target="_blank" rel="noopener" href="https://doi.org/10.1109/LRA.2018.2849506">Fankhauser 2018</a></td>
+<td>机器人中心高程图，每格维护高度与方差</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/leggedrobotics/elevation_mapping_cupy">elevation_mapping_cupy</a></td>
+<td>建图</td>
+<td><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2204.12876">Miki 2022</a></td>
+<td>GPU 版；漂移补偿、可见性清理、学习式通行性滤波</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/leggedrobotics/traversability_estimation">traversability_estimation</a></td>
+<td>通行性</td>
+<td><a target="_blank" rel="noopener" href="https://doi.org/10.1109/IROS.2016.7759199">Wermelinger 2016</a></td>
+<td>基于 grid_map 的通行性滤波器</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://docs.nav2.org/configuration/packages/configuring-smac-planner.html">Nav2</a></td>
+<td>规划</td>
+<td>—</td>
+<td>NavFn / Smac 2D / Hybrid-A* / State Lattice</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/nubot-nudt/T-Hybrid-planner">T-Hybrid-planner</a></td>
+<td>规划</td>
+<td><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2303.05304">T-Hybrid A*</a></td>
+<td>2D+2.5D 混合地图 + 地形感知 Hybrid A*</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://trg-planner.github.io">TRG-Planner 项目页</a></td>
+<td>规划</td>
+<td><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2501.01806">TRG-Planner</a></td>
+<td>可通行风险图，ICRA 2023 四足挑战赛冠军方案。<strong>仅有项目页，代码未公开</strong></td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/ZhiqiaoGuo/RB-TRG">RB-TRG</a></td>
+<td>规划</td>
+<td><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2608.16433">RB-TRG</a></td>
+<td>有向足迹风险图，ICRA 2026 最佳自主/机动奖</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://www.cmu-exploration.com/">CMU 自主导航开发环境</a></td>
+<td>系统</td>
+<td>—</td>
+<td>地形可通行性分析、避障、路点跟随与仿真环境</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://github.com/MichaelFYang/far_planner">FAR Planner</a></td>
+<td>规划</td>
+<td>—</td>
+<td>可视图规划，DARPA SubT 决赛探索扇区最多</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://se2-navmesh.github.io/">SE(2) NavMesh</a></td>
+<td>规划</td>
+<td><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2607.01454">SE(2) NavMesh</a></td>
+<td>朝向相关 NavMesh（代码待发布）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>选型上的一条经验</strong>：推荐工具时把它背后的论文一起读，比只看 README 清楚得多 ——
+参数含义、适用假设、已知局限通常只在论文里。上表的「对应论文」一列就是为此。</p>
+<p>系统级整体架构可参考 ETH 的<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2405.01792">轮式腿式机器人工作</a>：自适应运动控制 + 移动性感知的
+局部导航 + <strong>城市尺度的大范围路径规划</strong>，在苏黎世和塞维利亚做了公里级自主任务。</p>
+<h2 id="四、演进脉络">四、演进脉络</h2>
+<p>把这些工作按引用关系串起来，能看出比单篇阅读更清楚的东西。下面这张图是顺着引文关系
+整理的 —— 箭头表示后者引用并建立在前者之上。</p>
+<pre><code class=" mermaid">flowchart TD
+    W16[&quot;Wermelinger 2016&lt;br/&gt;腿式机器人地形导航规划&quot;] --&gt; F18[&quot;Fankhauser 2018&lt;br/&gt;概率地形建图&quot;]
+    K17[&quot;Krüsi 2017&lt;br/&gt;点云直接规划&quot;] --&gt; W16
+    K17 --&gt; TH23[&quot;T-Hybrid A* 2023&lt;br/&gt;2D+2.5D 混合地图&quot;]
+    F18 --&gt; M22[&quot;Miki 2022&lt;br/&gt;GPU 高程图&quot;]
+    F18 --&gt; D22[&quot;2.5D 导航系统 2022&lt;br/&gt;Nav2 集成&quot;]
+    W16 --&gt; STEP21[&quot;STEP 2021&lt;br/&gt;CVaR 尾部风险&quot;]
+    M22 --&gt; TRG25[&quot;TRG-Planner 2025&lt;br/&gt;可通行风险图&quot;]
+    STEP21 --&gt; TRG25
+    TH23 --&gt; RB26[&quot;RB-TRG 2026&lt;br/&gt;有向足迹风险图&quot;]
+    TRG25 --&gt; RB26
+    H20[&quot;Hines 2020&lt;br/&gt;负障碍&quot;] --&gt; RB26
+    M22 --&gt; SE26[&quot;SE(2) NavMesh 2026&lt;br/&gt;朝向相关多边形&quot;]
+    STEP21 --&gt; LR26[&quot;分层风险图 2026&lt;br/&gt;Noisy-OR 融合&quot;]
+</code></pre>
+<p>三条主线：</p>
+<p><strong>建图线（ETH 系）。</strong> Krüsi 2017 证明了可以直接在点云上规划但代价高昂 → Wermelinger
+2016 转向高程图上的导航规划 → Fankhauser 2018 把建图做成概率框架并<strong>维护每格方差</strong> →
+Miki 2022 上 GPU 并加入可见性清理。<strong>方差这条线索很关键</strong> —— 2018 年埋下的这个设计,
+是后来所有不确定性感知方法的前提。</p>
+<p><strong>风险线。</strong> STEP 2021 首次把 CVaR 尾部风险引入可通行性评估 → TRG-Planner 2025 把
+风险直接编码进图的边权 → RB-TRG 2026 进一步用有向足迹算风险的<strong>上尾特征</strong> → 同年
+分层风险图用 <strong>Noisy-OR</strong> 做多源风险融合。<strong>四篇独立工作、不同团队，都在朝「用概率而
+非加权代价描述风险」收敛</strong>，这个信号比任何单篇的性能数字都重要。</p>
+<p><strong>表示线。</strong> 从 2D 栅格到 2.5D 高程图是为了表达地形；从高程图到 TRG / NavMesh 是为了
+<strong>压缩规模并显式编码朝向</strong>。注意 SE(2) NavMesh 和 RB-TRG 是 2026 年同期的两篇，一个
+走多边形、一个走稀疏图，但解决的是同一个问题 —— <strong>非圆形机体的朝向相关通行性</strong>。
+这种「同期不同路径攻同一问题」的格局，通常意味着该问题刚刚成熟到值得攻。</p>
+<p>一个观察：<strong>RB-TRG 同时引用了 T-Hybrid A*、TRG-Planner 和 Hines 的负障碍工作</strong>，
+它是本文所覆盖的三条线的汇合点。想快速切入这个领域，从它的参考文献读起效率最高。</p>
+<h2 id="五、调研结论与方案建议">五、调研结论与方案建议</h2>
+<p><strong>以下是我基于上述文献的推断，不是论文结论，需自行验证。</strong></p>
+<h3 id="5-1-选型决策">5.1 选型决策</h3>
+<pre><code class=" mermaid">flowchart TD
+    A&#123;&quot;场景里有&lt;br/&gt;坡道 / 门槛 / 地面起伏吗&quot;&#125; --&gt;|否| B[&quot;2D 栅格 + Nav2&lt;br/&gt;不要过度设计&quot;]
+    A --&gt;|是| C&#123;&quot;有悬空障碍&lt;br/&gt;或多层结构吗&quot;&#125;
+    C --&gt;|否| D[&quot;2.5D 高程图&lt;br/&gt;elevation_mapping_cupy&lt;br/&gt;+ 通行性写入代价地图&lt;br/&gt;+ Nav2 规划器&quot;]
+    C --&gt;|是| E&#123;&quot;需要跨楼层吗&quot;&#125;
+    E --&gt;|否| F[&quot;3D 建图 + 多层投影&lt;br/&gt;OctoMap → 2.5D&lt;br/&gt;规划仍在 2.5D 上&quot;]
+    E --&gt;|是| G[&quot;多层图表示&lt;br/&gt;多层可通行图 / TRG / NavMesh&quot;]
+</code></pre>
+<h3 id="5-2-具体判断">5.2 具体判断</h3>
+<p><strong>默认路线是「3D 建图 + 2.5D 规划」。</strong> 既然已有 3D 激光，建图阶段没理由丢掉三维信息
+（悬空物和多层都在里面），但规划投影到 2.5D 控制开销。</p>
+<p><strong>通行性判据必须按平台标定，不要照搬论文参数。</strong> 公式结构通用，但 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ρ</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\rho_{max}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">ρ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">ma</span><span class="mord mathnormal mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>、
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub></mrow><annotation encoding="application/x-tex">h_{max}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">ma</span><span class="mord mathnormal mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>、roll/pitch 阈值必须按自己底盘实测能力定。</p>
+<p><strong>不对称的 pitch 阈值值得照搬。</strong> 上下坡安全裕度不同，对重心高的平台尤其重要。</p>
+<p><strong>朝向相关的通行性，取决于机体长宽比。</strong> 底盘接近方形或圆形时圆形膨胀够用；明显细长、
+或需要窄通道原地转身时，才考虑 <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2608.16433">RB-TRG</a> / <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2607.01454">SE(2) NavMesh</a> 这类方案。
+<strong>先量长宽比再决定，不要预先上复杂方案。</strong></p>
+<p><strong>风险感知比平均代价更适合重心高的平台。</strong> <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2303.01614">STEP</a> 的 CVaR 和 <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2608.16433">RB-TRG</a> 的
+上尾特征是同一思路的两种实现。轮式人形一次翻倒的代价远高于多绕路，值得优先考虑。</p>
+<p><strong>同一个公式在不同平台上语义可能相反。</strong> <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2303.05304">T-Hybrid A*</a> 的
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>G</mi><mi>h</mi></msub><mo>=</mo><msub><mi>G</mi><mi>l</mi></msub><mi>tan</mi><mo>⁡</mo><msub><mi>ρ</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub></mrow><annotation encoding="application/x-tex">G_h = G_l \tan\rho_{max}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">G</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">G</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">tan</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">ρ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">ma</span><span class="mord mathnormal mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 是为了<strong>排除</strong>悬空物（室外的树和桥与底盘无关）；但对轮式
+人形，桌子货架<strong>本身就是障碍</strong>，这个高度应取机体高度。照搬公式不看语义会出事。</p>
+<p><strong>全局规划不需要高频。</strong> 建图与全局规划 1 Hz、跟踪 10 Hz 是合理配置，算力优先给跟踪
+和局部避障。</p>
+<h3 id="5-3-开放问题">5.3 开放问题</h3>
+<p><strong>动态环境下的全局重规划触发条件。</strong> 见 2.6 节 —— <a target="_blank" rel="noopener" href="https://doi.org/10.1109/LRA.2023.3313052">De Luca 2023</a> 的行为树方案是
+目前找到的唯一明确线索，D* Lite 与通行性代价如何结合仍需自行验证。</p>
+<p><strong>机体高度可变时的表示扩展。</strong> <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2607.01454">SE(2) NavMesh</a> 处理 yaw 的分层方式能否推广到
+高度维度，尚无现成工作。</p>
+<h2 id="六、可能的研究方向与创新方案">六、可能的研究方向与创新方案</h2>
+<p><strong>以下是我基于上述脉络的推断，不是文献结论。</strong> 每条给出问题、依据和一个可落地的
+方案草图。</p>
+<h3 id="6-1-把机体高度加进-SE-2-，做-SE-2-×H-的通行性">6.1 把机体高度加进 SE(2)，做 SE(2)×H 的通行性</h3>
+<p><strong>问题。</strong> <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2607.01454">SE(2) NavMesh</a> 自己在 Limitations 里承认：它只考虑<strong>固定机体高度</strong>，
+因此「降低高度就能通过」的区域会被误判为不可通行，可通行面积被系统性低估。而轮式
+人形、可升降底盘、轮式腿式平台恰恰普遍能调整躯干高度。</p>
+<p><strong>依据。</strong> SE(2) NavMesh 已经证明了「把一个额外自由度离散成分层图、层内平移连通、
+层间转移连通」这套机制是可行且高效的 —— 它对 yaw 就是这么做的。<strong>高度和 yaw 在
+结构上是同一类问题。</strong></p>
+<p><strong>方案草图。</strong> 把机体高度离散成 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>H</mi></msub></mrow><annotation encoding="application/x-tex">N_H</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.08125em;">H</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 档（如 3 档：常态 / 半蹲 / 最低），对每档用
+对应的足迹掩膜和高度阈值独立评估通行性，生成 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi mathvariant="normal">Ψ</mi></msub><mo>×</mo><msub><mi>N</mi><mi>H</mi></msub></mrow><annotation encoding="application/x-tex">N_\Psi \times N_H</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">Ψ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.08125em;">H</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 层。层间转移分两类：
+同高度不同 yaw 的原地旋转、同 yaw 不同高度的升降。升降的代价按<strong>耗时加稳定性惩罚</strong>
+计 —— 降低重心通常更稳，但升降本身耗时且过程中重心轨迹有风险。ASA 的三阶段寻路可以
+直接复用，只是状态多了一维。</p>
+<p><strong>预期收益与风险。</strong> 收益是窄空间可通行面积的显著提升（对标 SE(2) NavMesh 相对经典
+NavMesh 的 50%）。风险是状态空间乘以 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>H</mi></msub></mrow><annotation encoding="application/x-tex">N_H</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.08125em;">H</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>，需要验证大场景下是否还能实时 —— 好在
+高度的档位数远少于 yaw，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mi>H</mi></msub><mo>≤</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">N_H \le 4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.109em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.08125em;">H</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span> 应该可控。</p>
+<h3 id="6-2-用-BIM-楼层平面图做室内版的「超视距先验」">6.2 用 BIM / 楼层平面图做室内版的「超视距先验」</h3>
+<p><strong>问题。</strong> 趋势一那批工作（卫星影像、航空激光学可通行性）全部面向室外。室内轮式
+机器人有同样的近视问题 —— 传感器看不到隔壁房间，但全局路径的优劣恰恰取决于那里。</p>
+<p><strong>依据。</strong> <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2607.23743">Viswanath 等</a> 的关键设计不是「用卫星图」，而是<strong>用一种覆盖全域的
+俯视先验，配合稀疏的真实轨迹监督</strong>。室内的等价物是 <strong>BIM 模型或楼层平面图</strong> ——
+覆盖全域、免费获取、且天然含语义（门、楼梯、电梯、房间功能）。<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2309.04791">osmAG</a> 已经
+证明了建筑级拓扑图对粗粒度规划有用，缺的是「从图纸预测可通行性」这一步。</p>
+<p><strong>方案草图。</strong> 以 BIM / 平面图为输入，预测一张连续的先验可通行性图；监督信号用机器人
+自己历史运行的轨迹（等价于人类驾驶轨迹），几何先验用已建的高程图做自监督约束。在线
+运行时把先验图与实时高程图融合 —— 融合方式可以直接借 <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2607.13497">Genua 等</a> 的 Noisy-OR。</p>
+<p><strong>这个方案的额外价值</strong>：图纸和实际不符的地方（临时堆放、改造）会表现为先验与实测的
+显著分歧，这本身就是有用的信号，可以驱动重新探索。</p>
+<h3 id="6-3-把重规划触发条件建模成风险变化，而不是几何变化">6.3 把重规划触发条件建模成风险变化，而不是几何变化</h3>
+<p><strong>问题。</strong> 第 2.6 节留的开放问题 —— 动态环境下<strong>什么时候该重规划</strong>。现有做法要么定时
+触发，要么在检测到路径被阻断时触发，两者都不够。定时重规划浪费算力；等到阻断再规划
+往往已经晚了。</p>
+<p><strong>依据。</strong> <a target="_blank" rel="noopener" href="https://doi.org/10.1109/LRA.2023.3313052">De Luca 等</a> 用行为树把重规划的控制流显式建模，但触发条件本身仍是
+几何判据。而趋势二那批工作已经把可通行性做成了<strong>概率量</strong>。既然代价是概率，<strong>代价的
+变化量</strong>就是可度量的。</p>
+<p><strong>方案草图。</strong> 维护当前全局路径沿线的累积风险 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">R(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span>。局部地图每次更新后重算
+<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">R(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span>，当<strong>风险增量超过阈值</strong>或<strong>当前路径风险超过次优路径的估计风险</strong>时触发重规划。
+前者应对突发障碍，后者应对「原路径还能走但已经不划算」的渐变情形 —— 后一种是纯几何
+判据完全捕捉不到的。配合 D* Lite 做增量式重算，避免每次全量重规划。</p>
+<p><strong>验证方式。</strong> 在同一动态场景下对比定时触发、几何触发、风险触发三种策略的干预次数
+和总耗时。</p>
+<h3 id="6-4-轮式人形专属：把上半身状态纳入底盘通行性">6.4 轮式人形专属：把上半身状态纳入底盘通行性</h3>
+<p><strong>问题。</strong> 本文所有工作都把机器人当成一个刚性足迹。但轮式人形的<strong>上半身是可动的</strong> ——
+手臂展开时的投影、搬运物体时的重心偏移、俯身时的高度变化，都会改变底盘的通行性。</p>
+<p><strong>依据。</strong> <a target="_blank" rel="noopener" href="https://arxiv.org/abs/2608.06688">Wang 等</a> 已经把「本体特定的移动性约束」提为显式问题；
+<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2608.00206">门洞导航那篇</a> 也开始协调底盘与机械臂的运动。但都停留在局部规划层面，<strong>全局
+规划仍然假设机体形状固定</strong>。</p>
+<p><strong>方案草图。</strong> 把上半身构型抽象成少数几个<strong>任务态</strong>（空载 / 持物 / 手臂收拢 /
+手臂展开），每个任务态对应一组足迹掩膜和重心高度参数。全局规划时，任务序列是已知的
+（先去 A 取物、再去 B 放下），因此可以<strong>分段用不同的通行性图规划</strong>，在任务态切换点
+做拼接。这比在线维护一个连续的构型相关通行性要现实得多。</p>
+<p><strong>这条我认为是轮式人形相对普通 AGV 最本质的差异</strong>，也是现有文献覆盖最薄的地方 ——
+本次调研没有找到任何一篇正面处理它。</p>
+<h2 id="七、参考文献">七、参考文献</h2>
+<p><strong>说明</strong>：💻 = 有公开代码，📊 = 有公开数据集，🔗 = 仅有项目页。本节逐条核对过
+各论文正文中的链接，未标注的即为未找到公开实现。</p>
+<p><strong>核心论文</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2303.05304">T-Hybrid A*</a> — Hybrid Map-Based Path Planning for Robot Navigation in
+Unstructured Environments, arXiv:2303.05304 ｜ 💻 <a target="_blank" rel="noopener" href="https://github.com/nubot-nudt/T-Hybrid-planner">代码</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2209.07252">2.5D 导航系统</a> — 2.5D Mapping, Pathfinding and Path Following,
+arXiv:2209.07252 ｜ 无独立仓库，基于 <a target="_blank" rel="noopener" href="https://github.com/ANYbotics/elevation_mapping">elevation_mapping</a> 与 <a target="_blank" rel="noopener" href="https://docs.nav2.org/configuration/packages/configuring-smac-planner.html">Nav2</a> 实现</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2607.01454">SE(2) NavMesh</a> — SE(2) Navigation Mesh, arXiv:2607.01454 ｜ 🔗 <a target="_blank" rel="noopener" href="https://se2-navmesh.github.io/">项目页</a>（代码待发布）</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2606.19555">SCAN-Planner</a> — arXiv:2606.19555 ｜ 💻 <a target="_blank" rel="noopener" href="https://github.com/wuyi2121/SCAN-Planner">代码</a>（待发布）</li>
+</ul>
+<p><strong>图表示与风险感知</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2501.01806">TRG-Planner</a> — Traversal Risk Graph-Based Path Planning, arXiv:2501.01806
+｜ 🔗 <a target="_blank" rel="noopener" href="https://trg-planner.github.io">项目页</a>（代码未公开）</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2608.16433">RB-TRG</a> — Robot-Body-Aware TRG Planning for Wheeled-Legged Robots,
+arXiv:2608.16433 ｜ 💻 <a target="_blank" rel="noopener" href="https://github.com/ZhiqiaoGuo/RB-TRG">代码</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2303.01614">STEP</a> — Stochastic Traversability Evaluation and Planning, arXiv:2303.01614
+｜ 未开源</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2303.01420">ArtPlanner</a> — Robust Legged Robot Navigation in the Field, arXiv:2303.01420</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2309.04791">osmAG</a> — Hierarchical Semantic Topometric Area Graph Maps, arXiv:2309.04791</li>
+</ul>
+<p><strong>建图与可通行性</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://doi.org/10.1109/LRA.2018.2849506">Fankhauser 等 2018</a> — Probabilistic Terrain Mapping for Mobile Robots With
+Uncertain Localization, RA-L ｜ 💻 <a target="_blank" rel="noopener" href="https://github.com/ANYbotics/elevation_mapping">elevation_mapping</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2204.12876">Miki 等 2022</a> — Elevation Mapping for Locomotion and Navigation using GPU,
+arXiv:2204.12876 ｜ 💻 <a target="_blank" rel="noopener" href="https://github.com/leggedrobotics/elevation_mapping_cupy">elevation_mapping_cupy</a></li>
+<li><a target="_blank" rel="noopener" href="https://doi.org/10.1109/IROS.2016.7759199">Wermelinger 等 2016</a> — Navigation planning for legged robots in challenging
+terrain, IROS ｜ 💻 <a target="_blank" rel="noopener" href="https://github.com/leggedrobotics/traversability_estimation">traversability_estimation</a></li>
+<li><a target="_blank" rel="noopener" href="https://doi.org/10.1002/rob.21700">Krüsi 等 2017</a> — Driving on Point Clouds, JFR</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2010.16018">Hines 等 2020</a> — Negative Obstacle Navigation, arXiv:2010.16018</li>
+</ul>
+<p><strong>其他地图表示</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1710.10523">室内不平整环境导航</a> — arXiv:1710.10523 ｜ 未开源</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2504.21622">多层点云加权可通行图</a> — arXiv:2504.21622 ｜ 未开源</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2406.13910">A-OctoMap</a> — arXiv:2406.13910（改进 JPS，未开源）／
+<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2603.22508">Parallel OctoMapping</a> — arXiv:2603.22508</li>
+</ul>
+<p><strong>2026 年最新进展</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2607.23743">Viswanath 等 2026</a> — Learning Traversability-Aware Global Planners for Long
+Horizon Off-Road Navigation, arXiv:2607.23743 ｜ 📊 <a target="_blank" rel="noopener" href="https://huggingface.co/datasets/anony-008/offroad-global-nav">数据集</a>（299 场景 / 1244 km²）</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2607.17984">Sivaprakasam 等 2026</a> — Distilling Global Traversability Priors, arXiv:2607.17984</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2608.17038">Singh 等 2026</a> — Terrain-Aware Local Path Planning with Global DEM Integration,
+arXiv:2608.17038</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2607.13497">Genua 等 2026</a> — Layered Risk Mapping for Autonomous Patient Transport,
+arXiv:2607.13497</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2608.17703">Arief 等 2026</a> — Dijkstra as an Oracle for Online Stochastic Shortest Path,
+arXiv:2608.17703</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2608.06688">Wang 等 2026</a> — CrossTracer: Cross-Embodiment Navigation, arXiv:2608.06688</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2608.00206">Sinaei 等 2026</a> — Motion Planning for Mobile Manipulators Navigating Doorways,
+arXiv:2608.00206</li>
+</ul>
+<p><strong>系统与综述</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2405.01792">轮式腿式机器人导航与运动</a> — arXiv:2405.01792</li>
+<li><a target="_blank" rel="noopener" href="https://doi.org/10.1109/LRA.2023.3313052">De Luca 等 2023</a> — Online Replanning and Recovery Behaviors Using Behavior
+Trees, RA-L</li>
+<li><a target="_blank" rel="noopener" href="https://doi.org/10.55417/fr.2022049">Borges 等 2022</a> — A Survey on Terrain Traversability Analysis for Autonomous
+Ground Vehicles, Field Robotics</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2204.10883">可通行性估计综述</a> — arXiv:2204.10883 ／
+<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2312.16839">地面分割与可通行性估计综述</a> — arXiv:2312.16839</li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2011.00491">MRPB 1.0</a> — 局部规划统一 benchmark, arXiv:2011.00491</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%9C%BA%E5%99%A8%E4%BA%BA%E5%AD%A6/" class="category-chain-item">机器人学</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%9C%BA%E5%99%A8%E4%BA%BA%E5%AD%A6/%E5%AF%BC%E8%88%AA%E8%A7%84%E5%88%92/" class="category-chain-item">导航规划</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E8%B0%83%E7%A0%94/" class="print-no-link">#调研</a>
+      
+        <a href="/tags/%E5%85%A8%E5%B1%80%E8%B7%AF%E5%BE%84%E8%A7%84%E5%88%92/" class="print-no-link">#全局路径规划</a>
+      
+        <a href="/tags/%E9%AB%98%E7%A8%8B%E5%9B%BE/" class="print-no-link">#高程图</a>
+      
+        <a href="/tags/%E5%8F%AF%E9%80%9A%E8%A1%8C%E6%80%A7/" class="print-no-link">#可通行性</a>
+      
+        <a href="/tags/3D%E6%BF%80%E5%85%89%E9%9B%B7%E8%BE%BE/" class="print-no-link">#3D激光雷达</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>轮式机器人的全局路径规划调研</div>
+      <div>https://ethanyliang.github.io/2026/08/26/轮式机器人的全局路径规划调研/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>EthanYLiang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月26日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年10月14日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/29/%E8%A6%86%E7%9B%96%E5%BC%8F%E8%B7%AF%E5%BE%84%E8%A7%84%E5%88%92%E8%B0%83%E7%A0%94/" title="覆盖式路径规划调研">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">覆盖式路径规划调研</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/08/26/ROS%E6%9C%BA%E5%99%A8%E4%BA%BA%E5%BC%80%E5%8F%91%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E9%80%9F%E6%9F%A5/" title="ROS机器人开发常用命令速查">
+                        <span class="hidden-mobile">ROS机器人开发常用命令速查</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+    <div id="giscus" class="giscus"></div>
+    <script type="text/javascript">
+      Fluid.utils.loadComments('#giscus', function() {
+        var options = {"repo":"EthanYLiang/EthanYLiang.github.io","repo-id":"R_kgDOQj-08A","category":"Announcements","category-id":"DIC_kwDOQj-08M4Czfip","theme-light":"light","theme-dark":"dark","mapping":"pathname","reactions-enabled":1,"emit-metadata":0,"input-position":"top","lang":"zh-CN"};
+        var attributes = {};
+        for (let option in options) {
+          if (!option.startsWith('theme-')) {
+            var key = option.startsWith('data-') ? option : 'data-' + option;
+            attributes[key] = options[option];
+          }
+        }
+        var light = 'light';
+        var dark = 'dark';
+        window.GiscusThemeLight = light;
+        window.GiscusThemeDark = dark;
+        attributes['data-theme'] = document.documentElement.getAttribute('data-user-color-scheme') === 'dark' ? dark : light;
+        for (let attribute in attributes) {
+          var value = attributes[attribute];
+          if (value === undefined || value === null || value === '') {
+            delete attributes[attribute];
+          }
+        }
+        var s = document.createElement('script');
+        s.setAttribute('src', 'https://giscus.app/client.js');
+        s.setAttribute('crossorigin', 'anonymous');
+        for (let attribute in attributes) {
+          s.setAttribute(attribute, attributes[attribute]);
+        }
+        var ss = document.getElementsByTagName('script');
+        var e = ss.length > 0 ? ss[ss.length - 1] : document.head || document.documentElement;
+        e.parentNode.insertBefore(s, e.nextSibling);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+  <script>
+  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
+    mermaid.initialize({"theme":"default"});
+
+    Fluid.utils.listenDOMLoaded(function() {
+      Fluid.events.registerRefreshCallback(function() {
+        if ('mermaid' in window) {
+          mermaid.init();
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/openkounter.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

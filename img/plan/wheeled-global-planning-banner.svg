@@ -1,0 +1,78 @@
+<?xml version="1.0" standalone="no"?>
+<svg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#38bdf8" stroke-width="0.5" opacity="0.2"/>
+    </pattern>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0"/>
+    </radialGradient>
+    <marker id="pa" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7dd3fc"/>
+    </marker>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#0f172a"/>
+  <rect width="1920" height="1080" fill="url(#grid)"/>
+  <circle cx="960" cy="540" r="640" fill="url(#glow)"/>
+
+  <!-- 下层可通行区域：等距投影的多边形拼接 -->
+  <g stroke="#38bdf8" stroke-width="2.5">
+    <path d="M300,780 L660,600 L1020,780 L660,960 Z" fill="#1e293b" opacity="0.9"/>
+    <path d="M660,600 L1020,420 L1380,600 L1020,780 Z" fill="#17273d" opacity="0.9"/>
+    <path d="M1020,780 L1380,600 L1620,720 L1260,900 Z" fill="#1e293b" opacity="0.9"/>
+  </g>
+  <!-- 下层多边形内部的细分边界，暗示 NavMesh 的凸多边形剖分 -->
+  <g stroke="#7dd3fc" stroke-width="1.2" opacity="0.35">
+    <path d="M480,690 L840,870 M840,510 L1200,690 M1200,690 L1440,810"/>
+  </g>
+
+  <!-- 上层平台 -->
+  <g stroke="#38bdf8" stroke-width="2.5">
+    <path d="M760,330 L1060,180 L1360,330 L1060,480 Z" fill="#1e293b" opacity="0.92"/>
+  </g>
+  <g stroke="#7dd3fc" stroke-width="1.2" opacity="0.35">
+    <path d="M910,255 L1210,405"/>
+  </g>
+
+  <!-- 连接两层的楼梯 -->
+  <g stroke="#38bdf8" stroke-width="2" fill="#17273d" opacity="0.85">
+    <path d="M1060,480 L1180,540 L1120,570 L1000,510 Z"/>
+    <path d="M1000,510 L1120,570 L1060,600 L940,540 Z"/>
+    <path d="M940,540 L1060,600 L1000,630 L880,570 Z"/>
+  </g>
+
+  <!-- 不可通行区域（悬空障碍在地面的投影） -->
+  <g fill="#ec4899" opacity="0.22">
+    <path d="M540,720 L660,660 L780,720 L660,780 Z"/>
+    <path d="M1140,660 L1260,600 L1380,660 L1260,720 Z"/>
+  </g>
+  <g stroke="#ec4899" stroke-width="2.5" fill="none" opacity="0.8">
+    <path d="M540,720 L660,660 L780,720 L660,780 Z"/>
+    <path d="M1140,660 L1260,600 L1380,660 L1260,720 Z"/>
+  </g>
+
+  <!-- 跨层全局路径 -->
+  <path d="M420,810 C560,760 620,800 700,760 C800,710 860,660 940,600 C1000,556 1020,520 1060,480 C1100,440 1140,400 1180,370"
+        fill="none" stroke="#7dd3fc" stroke-width="7" stroke-linecap="round" marker-end="url(#pa)"/>
+
+  <!-- 路径上的朝向采样：短线段表示 yaw -->
+  <g stroke="#e0f2fe" stroke-width="4" stroke-linecap="round" opacity="0.9">
+    <path d="M700,760 l40,-22"/>
+    <path d="M940,600 l40,-26"/>
+    <path d="M1060,480 l38,-28"/>
+  </g>
+
+  <!-- 起点 -->
+  <circle cx="420" cy="810" r="34" fill="#38bdf8" opacity="0.25"/>
+  <circle cx="420" cy="810" r="20" fill="#7dd3fc"/>
+  <!-- 终点 -->
+  <g fill="none" stroke="#ec4899" stroke-width="4">
+    <circle cx="1180" cy="370" r="34" opacity="0.55"/>
+    <circle cx="1180" cy="370" r="19"/>
+  </g>
+  <circle cx="1180" cy="370" r="7" fill="#ec4899"/>
+
+  <path d="M0,1000 Q480,920 960,1000 T1920,1000" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.25"/>
+</svg>

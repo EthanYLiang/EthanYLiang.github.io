@@ -1,0 +1,62 @@
+<?xml version="1.0" standalone="no"?>
+<svg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#38bdf8" stroke-width="0.5" opacity="0.2"/>
+    </pattern>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0"/>
+    </radialGradient>
+    <marker id="v" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#ec4899"/>
+    </marker>
+    <marker id="vb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7dd3fc"/>
+    </marker>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#0f172a"/>
+  <rect width="1920" height="1080" fill="url(#grid)"/>
+  <circle cx="960" cy="540" r="600" fill="url(#glow)"/>
+
+  <!-- 八边形底盘俯视轮廓 -->
+  <path d="M810,320 H1110 L1240,450 V630 L1110,760 H810 L680,630 V450 Z"
+        fill="#1e293b" stroke="#38bdf8" stroke-width="3.5" opacity="0.95"/>
+  <path d="M810,320 H1110 L1240,450 V630 L1110,760 H810 L680,630 V450 Z"
+        fill="none" stroke="#7dd3fc" stroke-width="1.5" opacity="0.4" transform="scale(0.94) translate(61,34)"/>
+
+  <!-- 四个 45° 布局的全向轮 -->
+  <g stroke="#e0f2fe" stroke-width="2.5" fill="#0f172a">
+    <rect x="-46" y="-19" width="92" height="38" rx="12" transform="translate(700,400) rotate(45)"/>
+    <rect x="-46" y="-19" width="92" height="38" rx="12" transform="translate(1220,400) rotate(-45)"/>
+    <rect x="-46" y="-19" width="92" height="38" rx="12" transform="translate(1220,680) rotate(45)"/>
+    <rect x="-46" y="-19" width="92" height="38" rx="12" transform="translate(700,680) rotate(-45)"/>
+  </g>
+  <!-- 轮上滚子 -->
+  <g stroke="#38bdf8" stroke-width="2" opacity="0.75">
+    <path d="M-34,-19 L-34,19 M-14,-19 L-14,19 M6,-19 L6,19 M26,-19 L26,19" transform="translate(700,400) rotate(45)"/>
+    <path d="M-34,-19 L-34,19 M-14,-19 L-14,19 M6,-19 L6,19 M26,-19 L26,19" transform="translate(1220,400) rotate(-45)"/>
+    <path d="M-34,-19 L-34,19 M-14,-19 L-14,19 M6,-19 L6,19 M26,-19 L26,19" transform="translate(1220,680) rotate(45)"/>
+    <path d="M-34,-19 L-34,19 M-14,-19 L-14,19 M6,-19 L6,19 M26,-19 L26,19" transform="translate(700,680) rotate(-45)"/>
+  </g>
+
+  <!-- 机体中心 -->
+  <circle cx="960" cy="540" r="14" fill="#7dd3fc"/>
+
+  <!-- 三自由度速度分量：vx、vy、ω -->
+  <path d="M960,540 L960,270" stroke="#7dd3fc" stroke-width="6" stroke-linecap="round" marker-end="url(#vb)"/>
+  <path d="M960,540 L1400,540" stroke="#7dd3fc" stroke-width="6" stroke-linecap="round" marker-end="url(#vb)"/>
+  <path d="M1090,300 A190,190 0 0 1 1200,410" fill="none" stroke="#ec4899" stroke-width="6"
+        stroke-linecap="round" marker-end="url(#v)"/>
+
+  <!-- 全向移动的方向散射 -->
+  <g stroke="#ec4899" stroke-width="2.5" opacity="0.3" stroke-linecap="round">
+    <path d="M960,540 L1230,270"/>
+    <path d="M960,540 L690,270"/>
+    <path d="M960,540 L1230,810"/>
+    <path d="M960,540 L690,810"/>
+  </g>
+
+  <path d="M0,990 Q480,910 960,990 T1920,990" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.25"/>
+</svg>

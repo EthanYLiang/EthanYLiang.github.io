@@ -1,0 +1,20 @@
+<?xml version="1.0" standalone="no"?>
+<svg id="svg2" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+                <rect width="1920" height="1080" fill="#0f172a"/>
+                <!-- Grid -->
+                <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+                    <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#38bdf8" stroke-width="0.5" opacity="0.2"/>
+                </pattern>
+                <rect width="1920" height="1080" fill="url(#grid)"/>
+                <!-- Glow elements -->
+                <circle cx="960" cy="1200" r="800" fill="url(#glow)" opacity="0.3"/>
+                <defs>
+                    <radialGradient id="glow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                        <stop offset="0%" style="stop-color:#38bdf8;stop-opacity:0.6"/>
+                        <stop offset="100%" style="stop-color:#0f172a;stop-opacity:0"/>
+                    </radialGradient>
+                </defs>
+                <!-- Abstract Lines -->
+                <path d="M0,540 Q480,400 960,540 T1920,540" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.4"/>
+                <path d="M0,560 Q480,420 960,560 T1920,560" fill="none" stroke="#ec4899" stroke-width="2" opacity="0.3"/>
+            </svg>

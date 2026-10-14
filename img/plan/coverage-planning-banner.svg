@@ -1,0 +1,85 @@
+<?xml version="1.0" standalone="no"?>
+<svg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#38bdf8" stroke-width="0.5" opacity="0.2"/>
+    </pattern>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0"/>
+    </radialGradient>
+    <marker id="ca" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7dd3fc"/>
+    </marker>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#0f172a"/>
+  <rect width="1920" height="1080" fill="url(#grid)"/>
+  <circle cx="960" cy="540" r="660" fill="url(#glow)"/>
+
+  <!-- 待覆盖区域：被临界点切成三个 cell -->
+  <g stroke="#38bdf8" stroke-width="2.5">
+    <path d="M300,300 L760,300 L760,780 L300,780 Z" fill="#1e293b" opacity="0.85"/>
+    <path d="M760,300 L1160,300 L1160,470 L760,470 Z" fill="#17273d" opacity="0.85"/>
+    <path d="M760,610 L1160,610 L1160,780 L760,780 Z" fill="#17273d" opacity="0.85"/>
+    <path d="M1160,300 L1620,300 L1620,780 L1160,780 Z" fill="#1e293b" opacity="0.85"/>
+  </g>
+
+  <!-- 中间的障碍物，正是它导致了连通性变化 -->
+  <rect x="800" y="500" width="320" height="80" rx="8" fill="#334155" stroke="#64748b" stroke-width="2.5"/>
+
+  <!-- 临界点处的分解线 -->
+  <g stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="12 10" opacity="0.85">
+    <line x1="760" y1="290" x2="760" y2="790"/>
+    <line x1="1160" y1="290" x2="1160" y2="790"/>
+  </g>
+  <g fill="#f59e0b">
+    <circle cx="760" cy="500" r="9"/>
+    <circle cx="760" cy="580" r="9"/>
+    <circle cx="1160" cy="500" r="9"/>
+    <circle cx="1160" cy="580" r="9"/>
+  </g>
+
+  <!-- cell 1 弓字形覆盖路径 -->
+  <path d="M340,340 L720,340 L720,414 L340,414 L340,488 L720,488 L720,562 L340,562
+           L340,636 L720,636 L720,710 L340,710 L340,740 L720,740"
+        fill="none" stroke="#7dd3fc" stroke-width="4" stroke-linejoin="round" opacity="0.95"/>
+
+  <!-- cell 2 上：弓字形 -->
+  <path d="M800,340 L1120,340 L1120,405 L800,405 L800,455 L1120,455"
+        fill="none" stroke="#7dd3fc" stroke-width="4" stroke-linejoin="round" opacity="0.95"/>
+
+  <!-- cell 2 下：弓字形 -->
+  <path d="M800,625 L1120,625 L1120,690 L800,690 L800,755 L1120,755"
+        fill="none" stroke="#7dd3fc" stroke-width="4" stroke-linejoin="round" opacity="0.95"/>
+
+  <!-- cell 3 弓字形 -->
+  <path d="M1200,340 L1580,340 L1580,414 L1200,414 L1200,488 L1580,488 L1580,562 L1200,562
+           L1200,636 L1580,636 L1580,710 L1200,710 L1200,740 L1580,740"
+        fill="none" stroke="#7dd3fc" stroke-width="4" stroke-linejoin="round" opacity="0.95"/>
+
+  <!-- cell 间的转移路径：遍历顺序，正是 GTSP 要优化的部分 -->
+  <g fill="none" stroke="#34d399" stroke-width="4" stroke-dasharray="16 12" marker-end="url(#ca)">
+    <path d="M720,740 C760,700 770,420 795,345"/>
+    <path d="M1120,455 C1150,530 1150,560 1125,620"/>
+    <path d="M1120,755 C1160,720 1170,420 1195,345"/>
+  </g>
+
+  <!-- 图例 -->
+  <g font-family="Segoe UI, Helvetica, Arial, sans-serif">
+    <text x="300" y="212" fill="#e2e8f0" font-size="62" font-weight="600">Coverage Path Planning</text>
+    <text x="302" y="262" fill="#94a3b8" font-size="30">牛耕式单元分解 · 弓字形覆盖 · 遍历顺序优化</text>
+
+    <g transform="translate(300,890)">
+      <line x1="0" y1="0" x2="70" y2="0" stroke="#7dd3fc" stroke-width="4"/>
+      <text x="86" y="10" fill="#cbd5e1" font-size="28">cell 内弓字形覆盖</text>
+
+      <line x1="420" y1="0" x2="490" y2="0" stroke="#34d399" stroke-width="4" stroke-dasharray="16 12"/>
+      <text x="506" y="10" fill="#cbd5e1" font-size="28">cell 间转移（遍历顺序）</text>
+
+      <line x1="960" y1="0" x2="1030" y2="0" stroke="#f59e0b" stroke-width="4" stroke-dasharray="12 10"/>
+      <circle cx="995" cy="0" r="8" fill="#f59e0b"/>
+      <text x="1046" y="10" fill="#cbd5e1" font-size="28">临界点与分解线</text>
+    </g>
+  </g>
+</svg>

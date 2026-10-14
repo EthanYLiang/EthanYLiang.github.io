@@ -1,0 +1,1034 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/bg/ely.png">
+  <link rel="icon" href="/img/bg/ely.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="EthanYLiang">
+  <meta name="keywords" content="SLAM,建图定位,多模态融合,融合感知,规划控制,VLN,视觉语言导航,具身智能,移动机器人,ROS">
+  
+    <meta name="description" content="Navigation框架在移动机器人中是比较常用的框架，在使用过程中发现框架本身存在了一些问题，包括组件高耦合、单体类职责过多、硬编码状态机、反馈信息贫乏、恢复机制不灵活、接口陈旧等问题，对Navigation框架进行分析和总结。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Navigation框架不足分析">
+<meta property="og:url" content="https://ethanyliang.github.io/2026/03/30/Navigation%E6%A1%86%E6%9E%B6%E4%B8%8D%E8%B6%B3%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="EthanYLiang">
+<meta property="og:description" content="Navigation框架在移动机器人中是比较常用的框架，在使用过程中发现框架本身存在了一些问题，包括组件高耦合、单体类职责过多、硬编码状态机、反馈信息贫乏、恢复机制不灵活、接口陈旧等问题，对Navigation框架进行分析和总结。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ethanyliang.github.io/img/plan/navigation-banner.svg">
+<meta property="article:published_time" content="2026-03-30T08:47:04.000Z">
+<meta property="article:modified_time" content="2026-10-14T08:20:45.428Z">
+<meta property="article:author" content="EthanYLiang">
+<meta property="article:tag" content="ROS">
+<meta property="article:tag" content="move_base">
+<meta property="article:tag" content="导航规划">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://ethanyliang.github.io/img/plan/navigation-banner.svg">
+  
+  
+  
+  <title>Navigation框架不足分析 - EthanYLiang</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/KaTeX/0.16.2/katex.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"ethanyliang.github.io","root":"/","version":"1.9.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"expand_all":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"openkounter":{"server_url":"https://open-kounter.mintimate.cn","path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.2"><link rel="alternate" href="/atom.xml" title="EthanYLiang" type="application/atom+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>EthanY&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content (desktop) -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/series/vln/" target="_self">
+                <i class="iconfont icon-book"></i>
+                <span>VLN 系列</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/atom.xml" target="_self">
+                
+                <span>RSS</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile grid menu overlay -->
+<div id="mobile-grid-menu" class="d-lg-none">
+  <div class="mobile-grid-menu-inner">
+    <div class="container">
+      <div class="row">
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-home-fill"></i>
+                  <span>首页</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/series/vln/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-book"></i>
+                  <span>VLN 系列</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/archives/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-archive-fill"></i>
+                  <span>归档</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/categories/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-category-fill"></i>
+                  <span>分类</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/tags/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-tags-fill"></i>
+                  <span>标签</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/about/" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-user-fill"></i>
+                  <span>关于</span>
+                </div>
+              </a>
+            </div>
+          
+        
+          
+          
+          
+          
+            <div class="col-4 mobile-grid-cell">
+              <a href="/atom.xml" target="_self">
+                <div class="mobile-grid-item">
+                  <i class="iconfont icon-link-fill"></i>
+                  <span>RSS</span>
+                </div>
+              </a>
+            </div>
+          
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-search-btn">
+            <a href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-search"></i>
+                <span>搜索</span>
+              </div>
+            </a>
+          </div>
+        
+        
+          <div class="col-4 mobile-grid-cell" id="mobile-color-toggle-btn"
+               data-label-light="开灯"
+               data-label-dark="关灯">
+            <a href="javascript:;" aria-label="Color Toggle">
+              <div class="mobile-grid-item">
+                <i class="iconfont icon-dark" id="mobile-color-toggle-icon"></i>
+                <span id="mobile-color-toggle-label">关灯</span>
+              </div>
+            </a>
+          </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/plan/navigation-banner.svg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Navigation框架不足分析"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-03-30 16:47" pubdate>
+          2026年3月30日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          11k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          90 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Navigation框架不足分析</h1>
+            
+            
+              <div class="markdown-body">
+                
+    
+                <blockquote>
+<p>Navigation框架在移动机器人中是比较常用的框架，在使用过程中发现框架本身存在了一些问题，包括组件高耦合、单体类职责过多、硬编码状态机、反馈信息贫乏、恢复机制不灵活、接口陈旧等问题，对Navigation框架进行分析和总结。</p>
+</blockquote>
+<span id="more"></span>
+<p><strong>Navigation (Noetic版本) 整体功能包</strong></p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs scss">navigation (metapackage)<br>├─ amcl                      # 定位<br>├─ base_local_planner        # 基础局部规划器<br>├─ carrot_planner            # 简单全局规划器<br>├─ clear_costmap_recovery    # 恢复行为<br>├─ costmap_2d                # 代价地图<br>├─ dwa_local_planner         # DWA 局部规划器<br>├─ fake_localization         # 假定位<br>├─ global_planner            # 全局规划器<br>├─ map_server                # 地图服务器<br>├─ move_base                 # 核心协调器<br>├─ move_base_msgs            # 消息定义<br>├─ move_slow_and_clear       # 恢复行为<br>├─ navfn                     # Dijkstra 规划器<br>├─ nav_core                  # 接口定义<br>├─ rotate_recovery           # 恢复行为<br>└─ voxel_grid                # 体素网格<br></code></pre></td></tr></table></figure>
+<h2 id="一、组件间耦合度高">一、组件间耦合度高</h2>
+<p>内部耦合度高，难以替换单个组件。</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs scss">高耦合组件：<br>move_base<br>├─→ costmap_2d (强耦合)<br>├─→ nav_core (接口)<br>├─→ base_local_planner (强制)<br>├─→ navfn (强制)<br>├─→ clear_costmap_recovery (强制)<br>└─→ rotate_recovery (强制)<br><br>base_local_planner<br>├─→ costmap_2d (强耦合)<br>├─→ nav_core (接口)<br>└─→ voxel_grid (强耦合)<br><br>dwa_local_planner<br>├─→ base_local_planner (继承耦合)<br>├─→ costmap_2d (强耦合)<br>└─→ nav_core (接口)<br><br>navfn<br>├─→ costmap_2d (强耦合)<br>└─→ nav_core (接口)<br><br>global_planner<br>├─→ costmap_2d (强耦合)<br>├─→ navfn (依赖)<br>└─→ nav_core (接口)<br><br><br>move_base 依赖图简化：<br>        move_base<br>           ↓<br>    ┌──────┴──────┐<br>    ↓             ↓<br>costmap_2d    nav_core<br>    ↓             ↓<br>voxel_grid   planners<br>                  ↓<br>              costmap_2d (循环)<br><br></code></pre></td></tr></table></figure>
+<h2 id="二、单体类职责过多">二、单体类职责过多</h2>
+<p>无分层设计，职责过多；成员变量过多，难以理解和维护。</p>
+<p><strong>move_base 类</strong>，进行状态机管理、线程管理、规划器管理、代价地图管理、恢复行为管理、Action 服务器管理。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">MoveBase</span> &#123;<br><span class="hljs-keyword">private</span>:<br>  <span class="hljs-comment">// 状态机</span><br>  MoveBaseState state_;  <span class="hljs-comment">// PLANNING, CONTROLLING, CLEARING</span><br>  RecoveryTrigger recovery_trigger_;<br>  <br>  <span class="hljs-comment">// 规划器（直接持有）</span><br>  boost::shared_ptr&lt;nav_core::BaseLocalPlanner&gt; tc_;<br>  boost::shared_ptr&lt;nav_core::BaseGlobalPlanner&gt; planner_;<br>  <br>  <span class="hljs-comment">// 代价地图（直接持有）</span><br>  costmap_2d::Costmap2DROS* planner_costmap_ros_;<br>  costmap_2d::Costmap2DROS* controller_costmap_ros_;<br>  <br>  <span class="hljs-comment">// 恢复行为（直接持有）</span><br>  std::vector&lt;boost::shared_ptr&lt;nav_core::RecoveryBehavior&gt;&gt; recovery_behaviors_;<br>  <br>  <span class="hljs-comment">// 线程管理</span><br>  boost::thread* planner_thread_;<br>  boost::recursive_mutex planner_mutex_;<br>  boost::condition_variable_any planner_cond_;<br>  <br>  <span class="hljs-comment">// 路径缓冲</span><br>  std::vector&lt;geometry_msgs::PoseStamped&gt;* planner_plan_;<br>  std::vector&lt;geometry_msgs::PoseStamped&gt;* latest_plan_;<br>  std::vector&lt;geometry_msgs::PoseStamped&gt;* controller_plan_;<br>  <br>  <span class="hljs-comment">// ... 50+ 个成员变量</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+<p>**costmap_2d **</p>
+<p>costmap_2d 混合了多种职责，除了数据结构、消息定义和TF，还有传感器数据处理还有laser_geometry,、sensor_msgs、message_filters等。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">depend</span>&gt;</span>dynamic_reconfigure<span class="hljs-tag">&lt;/<span class="hljs-name">depend</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">depend</span>&gt;</span>eigen<span class="hljs-tag">&lt;/<span class="hljs-name">depend</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">depend</span>&gt;</span>geometry_msgs<span class="hljs-tag">&lt;/<span class="hljs-name">depend</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">depend</span>&gt;</span>laser_geometry<span class="hljs-tag">&lt;/<span class="hljs-name">depend</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">depend</span>&gt;</span>map_msgs<span class="hljs-tag">&lt;/<span class="hljs-name">depend</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">depend</span>&gt;</span>message_filters<span class="hljs-tag">&lt;/<span class="hljs-name">depend</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">depend</span>&gt;</span>nav_msgs<span class="hljs-tag">&lt;/<span class="hljs-name">depend</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">depend</span>&gt;</span>pluginlib<span class="hljs-tag">&lt;/<span class="hljs-name">depend</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">depend</span>&gt;</span>roscpp<span class="hljs-tag">&lt;/<span class="hljs-name">depend</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">depend</span>&gt;</span>rostest<span class="hljs-tag">&lt;/<span class="hljs-name">depend</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">depend</span>&gt;</span>sensor_msgs<span class="hljs-tag">&lt;/<span class="hljs-name">depend</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">depend</span>&gt;</span>std_msgs<span class="hljs-tag">&lt;/<span class="hljs-name">depend</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">depend</span>&gt;</span>tf2<span class="hljs-tag">&lt;/<span class="hljs-name">depend</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">depend</span>&gt;</span>tf2_ros<span class="hljs-tag">&lt;/<span class="hljs-name">depend</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">depend</span>&gt;</span>visualization_msgs<span class="hljs-tag">&lt;/<span class="hljs-name">depend</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">depend</span>&gt;</span>voxel_grid<span class="hljs-tag">&lt;/<span class="hljs-name">depend</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<h2 id="三、多线程混乱导致的同步问题">三、多线程混乱导致的同步问题</h2>
+<p><code>move_base</code> 的线程模型非常复杂且难以控制，规划器需要频繁加锁访问代价地图，代价地图更新时持有锁，阻塞规划器，可能导致规划器使用过时的代价地图数据，频繁的锁竞争，可能导致碰撞。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><code class="hljs c++">导航流程：Global Costmap -&gt; Planner -&gt; Local Costmap -&gt; Planner -&gt; Command Velocities<br>一旦全局规划线程（Global Planner）计算出路径，它会立即、自动地将路径交换给局部规划器（Local Planner）所在的控制线程。<br>    <br>	[主线程 / Control Thread]                      [规划线程 / Planner Thread]<br>               |                                              |<br>      <span class="hljs-number">1.</span> 收到目标 (executeCb)                                  | 挂起等待 (wait)<br>               |                                              |<br>      <span class="hljs-number">2.</span> 唤醒规划线程 (notify) ------------------------------&gt;  | 醒来<br>               |                                              |<br>      <span class="hljs-number">3.</span> 进入控制循环 (executeCycle)                            | <span class="hljs-number">4.</span> 锁定全局地图<br>         (<span class="hljs-number">20</span>Hz)                                               |    运行 makePlan<br>               |                                              |    <br>               |                                              |<br>               |                                              | <span class="hljs-number">5.</span> 规划完成<br>               |                                              |    锁定 planner_mutex_<br>               |                                              |    交换指针: planner_plan -&gt; latest_plan<br>               | &lt;----------(new_global_plan_ = <span class="hljs-literal">true</span>)-------- |    解锁<br>               |                                              |    继续挂起或再次规划<br>               |<br>      <span class="hljs-number">6.</span> 发现新路径标志<br>         锁定 planner_mutex_<br>         交换指针: latest_plan -&gt; controller_plan_<br>         解锁<br>               |<br>      <span class="hljs-number">7.</span> 锁定局部地图<br>         运行 computeVelocityCommands<br>         发布 cmd_vel<br><br><br><span class="hljs-comment">// move_base/src/move_base.cpp</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">MoveBase::executeCb</span><span class="hljs-params">(...)</span> </span>&#123;<br>  <span class="hljs-comment">// 主线程</span><br>  <span class="hljs-function">ros::Rate <span class="hljs-title">r</span><span class="hljs-params">(controller_frequency_)</span></span>;<br>  <br>  <span class="hljs-keyword">while</span>(n.<span class="hljs-built_in">ok</span>()) &#123;<br>    <span class="hljs-comment">// 访问代价地图（需要加锁）</span><br>    <span class="hljs-function">boost::unique_lock&lt;costmap_2d::Costmap2D::<span class="hljs-type">mutex_t</span>&gt; <span class="hljs-title">lock</span><span class="hljs-params">(</span></span><br><span class="hljs-params"><span class="hljs-function">      *(planner_costmap_ros_-&gt;getCostmap()-&gt;getMutex())</span></span><br><span class="hljs-params"><span class="hljs-function">    )</span></span>;<br>    <br>    <span class="hljs-comment">// 全局规划（可能需要几百毫秒）</span><br>    planner_-&gt;<span class="hljs-built_in">makePlan</span>(start, goal, global_plan_);<br>    <br>    lock.<span class="hljs-built_in">unlock</span>();  <span class="hljs-comment">// 释放锁</span><br>    <br>    <span class="hljs-comment">// 局部规划（又需要加锁）</span><br>    <span class="hljs-function">boost::unique_lock&lt;costmap_2d::Costmap2D::<span class="hljs-type">mutex_t</span>&gt; <span class="hljs-title">lock2</span><span class="hljs-params">(</span></span><br><span class="hljs-params"><span class="hljs-function">      *(controller_costmap_ros_-&gt;getCostmap()-&gt;getMutex())</span></span><br><span class="hljs-params"><span class="hljs-function">    )</span></span>;<br>    <br>    controller_-&gt;<span class="hljs-built_in">computeVelocityCommands</span>(cmd_vel);<br>  &#125;<br>&#125;<br><br><span class="hljs-comment">// 代价地图更新线程</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Costmap2DROS::mapUpdateLoop</span><span class="hljs-params">(<span class="hljs-type">double</span> frequency)</span> </span>&#123;<br>  <span class="hljs-function">ros::Rate <span class="hljs-title">r</span><span class="hljs-params">(frequency)</span></span>;  <span class="hljs-comment">// 例如 5Hz</span><br>  <br>  <span class="hljs-keyword">while</span> (ros::<span class="hljs-built_in">ok</span>() &amp;&amp; !stop_updates_) &#123;<br>    <span class="hljs-comment">// 获取锁</span><br>    <span class="hljs-function">boost::unique_lock&lt;boost::recursive_mutex&gt; <span class="hljs-title">lock</span><span class="hljs-params">(*(layered_costmap_-&gt;getCostmap()-&gt;getMutex()))</span></span>;<br>    <br>    <span class="hljs-comment">// 更新代价地图（可能需要几十毫秒）</span><br>    layered_costmap_-&gt;<span class="hljs-built_in">updateMap</span>(x, y, yaw);<br>    <br>    lock.<span class="hljs-built_in">unlock</span>();<br>    <br>    r.<span class="hljs-built_in">sleep</span>();<br>  &#125;<br>&#125;<br><br><br><span class="hljs-comment">//多线程协调有时出现7秒左右的延迟（github仓库提交的问题）</span><br>时间轴：<br>T0: 传感器检测到障碍物<br>T1: 代价地图更新线程处理数据（可能延迟）<br>T2: 局部规划器读取代价地图（可能读到旧数据）<br>T3: 机器人执行速度命令（可能已经撞上障碍物）<br></code></pre></td></tr></table></figure>
+<h2 id="四、move-base-硬编码状态机">四、move_base 硬编码状态机</h2>
+<p>在标准 <code>move_base</code> 中，导航逻辑被硬编码为一个固定的有限状态机（FSM）：<code>PLANNING</code> -&gt; <code>CONTROLLING</code> -&gt; <code>CLEARING</code>（恢复），限制了机器人的复杂行为。</p>
+<p>无法插入自定义逻辑，比如&quot;规划前先旋转&quot;、&quot;失败后等待一段时间&quot;等。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// move_base/src/move_base.cpp</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">MoveBase::executeCb</span><span class="hljs-params">(<span class="hljs-type">const</span> move_base_msgs::MoveBaseGoalConstPtr&amp; move_base_goal)</span> </span>&#123;<br>  <span class="hljs-comment">// 状态机完全硬编码</span><br>  <span class="hljs-function">ros::Rate <span class="hljs-title">r</span><span class="hljs-params">(controller_frequency_)</span></span>;<br>  <br>  <span class="hljs-keyword">while</span>(n.<span class="hljs-built_in">ok</span>()) &#123;<br>    <span class="hljs-keyword">if</span>(as_-&gt;<span class="hljs-built_in">isPreemptRequested</span>()) &#123;<br>      <span class="hljs-comment">// 处理抢占</span><br>      as_-&gt;<span class="hljs-built_in">setPreempted</span>();<br>      <span class="hljs-keyword">return</span>;<br>    &#125;<br><br>    <span class="hljs-comment">// 固定流程：全局规划 → 局部规划 → 恢复行为</span><br>    <span class="hljs-keyword">if</span>(runPlanner_) &#123;<br>      <span class="hljs-function">boost::unique_lock&lt;costmap_2d::Costmap2D::<span class="hljs-type">mutex_t</span>&gt; <span class="hljs-title">lock</span><span class="hljs-params">(*(planner_costmap_ros_-&gt;getCostmap()-&gt;getMutex()))</span></span>;<br>      <br>      <span class="hljs-keyword">if</span>(!planner_-&gt;<span class="hljs-built_in">makePlan</span>(start, goal, global_plan_)) &#123;<br>        <span class="hljs-comment">// 规划失败 → 执行恢复行为</span><br>        state_ = CLEARING;<br>      &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span>(state_ == CONTROLLING) &#123;<br>      <span class="hljs-keyword">if</span>(!controller_-&gt;<span class="hljs-built_in">computeVelocityCommands</span>(cmd_vel)) &#123;<br>        <span class="hljs-comment">// 控制失败 → 执行恢复行为</span><br>        state_ = CLEARING;<br>      &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span>(state_ == CLEARING) &#123;<br>      <span class="hljs-comment">// 固定的恢复行为序列</span><br>      <span class="hljs-keyword">if</span>(recovery_index_ &lt; recovery_behaviors_.<span class="hljs-built_in">size</span>()) &#123;<br>        recovery_behaviors_[recovery_index_]-&gt;<span class="hljs-built_in">runBehavior</span>();<br>        recovery_index_++;<br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-comment">// 所有恢复行为都失败</span><br>        as_-&gt;<span class="hljs-built_in">setAborted</span>(move_base_msgs::<span class="hljs-built_in">MoveBaseResult</span>(), <span class="hljs-string">&quot;Failed to find a valid plan&quot;</span>);<br>        <span class="hljs-keyword">return</span>;<br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="五、move-base-反馈贫乏">五、move_base 反馈贫乏</h2>
+<p><code>move_base</code> 的 Action 接口反馈非常有限，通常只返回当前的位置（base position），无法知道进度、当前状态详情、剩余距离。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-comment"># move_base_msgs/MoveBase.action</span><br><br><span class="hljs-string">geometry_msgs/PoseStamped</span> <span class="hljs-string">target_pose</span><br><span class="hljs-meta">---</span><br><span class="hljs-meta">---</span><br><span class="hljs-string">geometry_msgs/PoseStamped</span> <span class="hljs-string">base_position</span><br><br></code></pre></td></tr></table></figure>
+<h2 id="六、恢复行为机制不灵活">六、恢复行为机制不灵活</h2>
+<ul>
+<li>无论何种失败都执行相同序列 → 清除、旋转、清除、旋转</li>
+<li>无法根据失败类型定制</li>
+<li>可能执行无效的恢复动作</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">MoveBase::loadDefaultRecoveryBehaviors</span><span class="hljs-params">()</span> </span>&#123;<br>  recovery_behaviors_.<span class="hljs-built_in">clear</span>();<br>  <span class="hljs-keyword">try</span> &#123;<br>    <span class="hljs-comment">// 1. 保守清除代价地图</span><br>    <span class="hljs-function">boost::shared_ptr&lt;nav_core::RecoveryBehavior&gt; <span class="hljs-title">cons_clear</span><span class="hljs-params">(</span></span><br><span class="hljs-params"><span class="hljs-function">      recovery_loader_.createInstance(<span class="hljs-string">&quot;clear_costmap_recovery/ClearCostmapRecovery&quot;</span>))</span></span>;<br>    cons_clear-&gt;<span class="hljs-built_in">initialize</span>(<span class="hljs-string">&quot;conservative_reset&quot;</span>, &amp;tf_, planner_costmap_ros_, controller_costmap_ros_);<br>    recovery_behaviors_.<span class="hljs-built_in">push_back</span>(cons_clear);<br>    <br>    <span class="hljs-comment">// 2. 原地旋转</span><br>    <span class="hljs-function">boost::shared_ptr&lt;nav_core::RecoveryBehavior&gt; <span class="hljs-title">rotate</span><span class="hljs-params">(</span></span><br><span class="hljs-params"><span class="hljs-function">      recovery_loader_.createInstance(<span class="hljs-string">&quot;rotate_recovery/RotateRecovery&quot;</span>))</span></span>;<br>    <span class="hljs-keyword">if</span>(clearing_rotation_allowed_) &#123;<br>      rotate-&gt;<span class="hljs-built_in">initialize</span>(<span class="hljs-string">&quot;rotate_recovery&quot;</span>, &amp;tf_, planner_costmap_ros_, controller_costmap_ros_);<br>      recovery_behaviors_.<span class="hljs-built_in">push_back</span>(rotate);<br>    &#125;<br>    <br>    <span class="hljs-comment">// 3. 激进清除代价地图</span><br>    <span class="hljs-function">boost::shared_ptr&lt;nav_core::RecoveryBehavior&gt; <span class="hljs-title">ags_clear</span><span class="hljs-params">(</span></span><br><span class="hljs-params"><span class="hljs-function">      recovery_loader_.createInstance(<span class="hljs-string">&quot;clear_costmap_recovery/ClearCostmapRecovery&quot;</span>))</span></span>;<br>    ags_clear-&gt;<span class="hljs-built_in">initialize</span>(<span class="hljs-string">&quot;aggressive_reset&quot;</span>, &amp;tf_, planner_costmap_ros_, controller_costmap_ros_);<br>    recovery_behaviors_.<span class="hljs-built_in">push_back</span>(ags_clear);<br>    <br>    <span class="hljs-comment">// 4. 再次原地旋转</span><br>    <span class="hljs-keyword">if</span>(clearing_rotation_allowed_)<br>      recovery_behaviors_.<span class="hljs-built_in">push_back</span>(rotate);<br>  &#125; <span class="hljs-built_in">catch</span>(...) &#123; ... &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="七、nav-core-接口设计陈旧">七、nav_core 接口设计陈旧</h2>
+<p>nav_core 近十年无更新，nav_core 定义的接口（<code>makePlan</code>, <code>computeVelocityCommands</code>）返回值通常只是简单的 <code>bool</code>值（成功/失败），返回 false 时，无法知道失败原因，是没有路径？是检测到障碍物？是速度限制？还是算法内部错误？</p>
+<p>通过引用参数返回路径，不符合现代 C++ 设计。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// nav_core::BaseGlobalPlanner</span><br><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">makePlan</span><span class="hljs-params">(</span></span><br><span class="hljs-params"><span class="hljs-function">    <span class="hljs-type">const</span> PoseStamped&amp; start,</span></span><br><span class="hljs-params"><span class="hljs-function">    <span class="hljs-type">const</span> PoseStamped&amp; goal,</span></span><br><span class="hljs-params"><span class="hljs-function">    std::vector&lt;PoseStamped&gt;&amp; plan  <span class="hljs-comment">// 输出参数</span></span></span><br><span class="hljs-params"><span class="hljs-function">)</span></span>;<br></code></pre></td></tr></table></figure>
+<h2 id="八、nav-core魔法数字">八、nav_core魔法数字</h2>
+<p>COST_NEUTRAL：值为 50，但为什么是 50？注释缺失</p>
+<p>COST_FACTOR：代价缩放因子，计算逻辑不透明</p>
+<p>COST_DIAGONAL：对角线移动代价，硬编码为 <code>sqrt(2)</code></p>
+<p>难以理解的魔法数字，难以阅读和修改，另外在某些情况下会产生不安全的路径。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// navfn/src/navfn.cpp</span><br><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">NavFn::calcNavFnDijkstra</span><span class="hljs-params">(<span class="hljs-type">bool</span> atStart)</span> </span>&#123;<br>  <span class="hljs-built_in">setupNavFn</span>(<span class="hljs-literal">true</span>);<br><br>  <span class="hljs-type">int</span> cycle = <span class="hljs-number">0</span>;<br>  <span class="hljs-type">int</span> startCell = <span class="hljs-built_in">getIndex</span>(start[<span class="hljs-number">0</span>], start[<span class="hljs-number">1</span>]);<br>  <br>  <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; ns; i++) &#123;<br>    costarr[i] = COST_NEUTRAL + COST_FACTOR * costmap[i];  <span class="hljs-comment">// 魔法公式</span><br>  &#125;<br><br>  <span class="hljs-comment">// 硬编码的代价计算</span><br>  <span class="hljs-type">float</span> cost = costarr[c] + COST_NEUTRAL;  <span class="hljs-comment">// 为什么是 COST_NEUTRAL？</span><br>  <span class="hljs-type">float</span> dist = (<span class="hljs-built_in">abs</span>(dx) &gt; <span class="hljs-built_in">abs</span>(dy)) ? <br>    (<span class="hljs-type">float</span>)<span class="hljs-built_in">abs</span>(dx) + COST_DIAGONAL * (<span class="hljs-type">float</span>)<span class="hljs-built_in">abs</span>(dy) :  <span class="hljs-comment">// 魔法常数</span><br>    (<span class="hljs-type">float</span>)<span class="hljs-built_in">abs</span>(dy) + COST_DIAGONAL * (<span class="hljs-type">float</span>)<span class="hljs-built_in">abs</span>(dx);<br>  <br>  <span class="hljs-type">float</span> dnew = pc + cost + dist;  <span class="hljs-comment">// 组合公式难以理解</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="九、强制使用-Layers">九、强制使用 Layers</h2>
+<p><code>costmap_2d</code> 强制使用“层（Layers）”架构，但有时用户只需要一个简单的网格。</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs scss"><span class="hljs-comment">// costmap_2d/costmap_2d_ros.cpp</span><br>class Costmap2DROS &#123;<br>public:<br>  <span class="hljs-built_in">Costmap2DROS</span>(std::string name, tf::TransformListener&amp; tf) &#123;<br>    <span class="hljs-comment">// 强制创建 LayeredCostmap</span><br>    layered_costmap_ = new <span class="hljs-built_in">LayeredCostmap</span>(global_frame_, rolling_window_, track_unknown_space_);<br>    <br>    <span class="hljs-comment">// 必须通过插件系统加载 layers</span><br>    if (!loadPlugins()) &#123;<br>      <span class="hljs-built_in">ROS_ERROR</span>(&quot;Failed to load costmap plugins&quot;);<br>    &#125;<br>  &#125;<br><br>private:<br>  LayeredCostmap* layered_costmap_;  <span class="hljs-comment">// 不能为空</span><br>  std::vector&lt;boost::shared_ptr&lt;Layer&gt;&gt; plugins_;  <span class="hljs-comment">// 必须有至少一个 layer</span><br>&#125;;<br><br></code></pre></td></tr></table></figure>
+<h2 id="十、OccupancyGrid-数据丢失问题">十、OccupancyGrid 数据丢失问题</h2>
+<p>256 个唯一值被压缩到 101 个值（-1 到 100），中间的 252 个值（1-252）被映射到 98 个值（1-98），更丰富的信息（如不同的障碍物类型或膨胀层级），但在传输过程中精度被丢失了。</p>
+<p>地图数据死板地绑定为 <code>unsigned char</code> 数组，并强依赖于 ROS 消息格式，只能存 0-255 的整数，无法直接存储浮点数（如距离场、概率值）或自定义结构体。</p>
+<figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs accesslog">原始代价值: <span class="hljs-string">[0, 1, 2, ..., 252, 253, 254, 255]</span><br>            ↓ 转换<br>发布值:     <span class="hljs-string">[0, 1, 1, ..., 98,  99,  100, -1]</span><br>            ↑ 多个原始值映射到同一个发布值<br></code></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// costmap_2d/src/costmap_2d_publisher.cpp</span><br><span class="hljs-type">char</span>* Costmap2DPublisher::cost_translation_table_ = <span class="hljs-literal">NULL</span>;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">Costmap2DPublisher::prepareGrid</span><span class="hljs-params">()</span> </span>&#123;<br>  <span class="hljs-comment">// 初始化转换表</span><br>  <span class="hljs-keyword">if</span> (cost_translation_table_ == <span class="hljs-literal">NULL</span>) &#123;<br>    cost_translation_table_ = <span class="hljs-keyword">new</span> <span class="hljs-type">char</span>[<span class="hljs-number">256</span>];<br>    <br>    <span class="hljs-comment">// 特殊值映射</span><br>    cost_translation_table_[<span class="hljs-number">0</span>] = <span class="hljs-number">0</span>;      <span class="hljs-comment">// FREE_SPACE</span><br>    cost_translation_table_[<span class="hljs-number">253</span>] = <span class="hljs-number">99</span>;   <span class="hljs-comment">// INSCRIBED_INFLATED_OBSTACLE</span><br>    cost_translation_table_[<span class="hljs-number">254</span>] = <span class="hljs-number">100</span>;  <span class="hljs-comment">// LETHAL_OBSTACLE</span><br>    cost_translation_table_[<span class="hljs-number">255</span>] = <span class="hljs-number">-1</span>;   <span class="hljs-comment">// NO_INFORMATION</span><br>    <br>    <span class="hljs-comment">// 中间值线性映射到 [1, 98]</span><br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt; <span class="hljs-number">253</span>; i++) &#123;<br>      cost_translation_table_[i] = <span class="hljs-built_in">char</span>(<span class="hljs-number">1</span> + (<span class="hljs-number">97</span> * (i - <span class="hljs-number">1</span>)) / <span class="hljs-number">251</span>);<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-comment">// 转换代价地图数据</span><br>  <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> size = costmap_-&gt;<span class="hljs-built_in">getSizeInCellsX</span>() * costmap_-&gt;<span class="hljs-built_in">getSizeInCellsY</span>();<br>  grid_.data.<span class="hljs-built_in">resize</span>(size);<br>  <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span>* data = costmap_-&gt;<span class="hljs-built_in">getCharMap</span>();<br>  <span class="hljs-keyword">for</span> (<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; size; i++) &#123;<br>    grid_.data[i] = cost_translation_table_[data[i]];<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="十一、6DOF-位姿冗余">十一、6DOF 位姿冗余</h2>
+<p>强制使用 3D 数据结构，标准导航栈强制使用 <code>geometry_msgs/PoseStamped</code>，即使是 2D 地面机器人也必须携带 Z 轴坐标和四元数（Quaternion）。</p>
+<p>简单的角度计算需要反复进行“欧拉角 &lt;-&gt; 四元数”转换，不仅繁琐而且消耗算力。（在 10Hz 控制频率下，1000 次姿态操作累计需 23 毫秒）</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// geometry_msgs/PoseStamped</span><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">Pose</span> &#123;<br>    Point position;    <span class="hljs-comment">// x, y, z  &lt;- z 冗余</span><br>    Quaternion orientation;  <span class="hljs-comment">// x, y, z, w  &lt;- 只需要 yaw</span><br>&#125;;<br><br><span class="hljs-comment">// 即使是 2D 导航也用 3D 数据</span><br>geometry_msgs::PoseStamped goal;<br>goal.pose.position.x = <span class="hljs-number">5.0</span>;<br>goal.pose.position.y = <span class="hljs-number">3.0</span>;<br>goal.pose.position.z = <span class="hljs-number">0.0</span>;  <span class="hljs-comment">// 永远是 0，但必须存在</span><br>goal.pose.orientation = tf::<span class="hljs-built_in">createQuaternionMsgFromYaw</span>(<span class="hljs-number">1.57</span>);  <span class="hljs-comment">// 四元数转换开销</span><br><br><span class="hljs-comment">// 额外计算：每次访问都需要四元数转换</span><br><span class="hljs-type">double</span> yaw = tf::<span class="hljs-built_in">getYaw</span>(pose.pose.orientation); <br></code></pre></td></tr></table></figure>
+<h2 id="十二、局部规划器的调试困难">十二、局部规划器的调试困难</h2>
+<p>参数较多，30+ 个参数，很难调整其评分标准（Critics）或理解其为何选择某条轨迹，调参困难。</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs asciidoc">base<span class="hljs-emphasis">_local_planner 参数示例：</span><br><span class="hljs-emphasis">├─ max_vel_x, min_vel_x</span><br><span class="hljs-emphasis">├─ max_vel_theta, min_vel_theta</span><br><span class="hljs-emphasis">├─ acc_lim_x, acc_lim_theta</span><br><span class="hljs-emphasis">├─ xy_goal_tolerance, yaw_goal_tolerance</span><br><span class="hljs-emphasis">├─ sim_time, sim_granularity</span><br><span class="hljs-emphasis">├─ path_distance_bias, goal_distance_bias</span><br><span class="hljs-emphasis">├─ occdist_</span>scale<br>└─ ... <br></code></pre></td></tr></table></figure>
+<p><strong>参考资料</strong></p>
+<p><a target="_blank" rel="noopener" href="http://wiki.ros.org/navigation">http://wiki.ros.org/navigation</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/ros-planning/navigation">https://github.com/ros-planning/navigation</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%9C%BA%E5%99%A8%E4%BA%BA%E5%AD%A6/" class="category-chain-item">机器人学</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E6%9C%BA%E5%99%A8%E4%BA%BA%E5%AD%A6/%E5%AF%BC%E8%88%AA%E8%A7%84%E5%88%92/" class="category-chain-item">导航规划</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%AF%BC%E8%88%AA%E8%A7%84%E5%88%92/" class="print-no-link">#导航规划</a>
+      
+        <a href="/tags/move-base/" class="print-no-link">#move_base</a>
+      
+        <a href="/tags/ROS/" class="print-no-link">#ROS</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Navigation框架不足分析</div>
+      <div>https://ethanyliang.github.io/2026/03/30/Navigation框架不足分析/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>EthanYLiang</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年3月30日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年10月14日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="NC - 非商业性使用">
+                    <i class="iconfont icon-cc-nc"></i>
+                  </span>
+                </a>
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="SA - 相同方式共享">
+                    <i class="iconfont icon-cc-sa"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/08/26/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E4%BC%98%E5%8C%96%E4%B8%8E%E6%99%BA%E8%83%BD%E4%BD%93%E5%BA%94%E7%94%A8%E8%AE%B2%E5%BA%A7%E6%95%B4%E7%90%86/" title="大模型优化与智能体应用讲座整理">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">大模型优化与智能体应用讲座整理</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/12/08/%E5%9B%9B%E8%BD%AE%E5%85%A8%E5%90%91%E5%BA%95%E5%BA%95%E7%9B%98%E8%BF%90%E5%8A%A8%E5%AD%A6%E5%88%86%E6%9E%90/" title="四轮全向底底盘运动学分析">
+                        <span class="hidden-mobile">四轮全向底底盘运动学分析</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+    <div id="giscus" class="giscus"></div>
+    <script type="text/javascript">
+      Fluid.utils.loadComments('#giscus', function() {
+        var options = {"repo":"EthanYLiang/EthanYLiang.github.io","repo-id":"R_kgDOQj-08A","category":"Announcements","category-id":"DIC_kwDOQj-08M4Czfip","theme-light":"light","theme-dark":"dark","mapping":"pathname","reactions-enabled":1,"emit-metadata":0,"input-position":"top","lang":"zh-CN"};
+        var attributes = {};
+        for (let option in options) {
+          if (!option.startsWith('theme-')) {
+            var key = option.startsWith('data-') ? option : 'data-' + option;
+            attributes[key] = options[option];
+          }
+        }
+        var light = 'light';
+        var dark = 'dark';
+        window.GiscusThemeLight = light;
+        window.GiscusThemeDark = dark;
+        attributes['data-theme'] = document.documentElement.getAttribute('data-user-color-scheme') === 'dark' ? dark : light;
+        for (let attribute in attributes) {
+          var value = attributes[attribute];
+          if (value === undefined || value === null || value === '') {
+            delete attributes[attribute];
+          }
+        }
+        var s = document.createElement('script');
+        s.setAttribute('src', 'https://giscus.app/client.js');
+        s.setAttribute('crossorigin', 'anonymous');
+        for (let attribute in attributes) {
+          s.setAttribute(attribute, attributes[attribute]);
+        }
+        var ss = document.getElementsByTagName('script');
+        var e = ss.length > 0 ? ss[ss.length - 1] : document.head || document.documentElement;
+        e.parentNode.insertBefore(s, e.nextSibling);
+      });
+    </script>
+    <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    function isExpandAllEnabled() {
+      return CONFIG.toc && CONFIG.toc.expand_all === true;
+    }
+    function expandAllToc() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .tocbot-is-collapsed').removeClass('tocbot-is-collapsed');
+    }
+    function updateTocToggle($li, $childList) {
+      var $toggle = $li.children('.toc-toggle');
+      if ($toggle.length === 0) { return; }
+      var collapsed = $childList.hasClass('tocbot-is-collapsed');
+      $toggle
+        .toggleClass('toc-toggle-collapsed', collapsed)
+        .toggleClass('toc-toggle-expanded', !collapsed);
+    }
+    function bindTocToggle() {
+      if (!isExpandAllEnabled()) { return; }
+      jQuery('#toc-body .toc-list-item').each(function() {
+        var $li = jQuery(this);
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) {
+          if ($li.children('.toc-toggle').length === 0) {
+            $li.prepend('<span class="toc-toggle toc-toggle-placeholder" aria-hidden="true">›</span>');
+          }
+          return;
+        }
+
+        if ($li.children('.toc-toggle').length === 0) {
+          $li.prepend('<span class="toc-toggle toc-toggle-expanded" aria-hidden="true">›</span>');
+        }
+        updateTocToggle($li, $childList);
+      });
+      jQuery('#toc-body').off('click.tocToggle').on('click.tocToggle', '.toc-toggle', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $li = jQuery(this).parent('.toc-list-item');
+        var $childList = $li.children('ol');
+        if ($childList.length === 0) { return; }
+        $childList.toggleClass('tocbot-is-collapsed');
+        updateTocToggle($li, $childList);
+      });
+      if (!window.__tocToggleObserver) {
+        window.__tocToggleObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type !== 'attributes' || mutation.attributeName !== 'class') { return; }
+            var $list = jQuery(mutation.target);
+            var $li = $list.parent('.toc-list-item');
+            if ($li.length === 0) { return; }
+            updateTocToggle($li, $list);
+          });
+        });
+        jQuery('#toc-body ol').each(function() {
+          window.__tocToggleObserver.observe(this, { attributes: true });
+        });
+      }
+    }
+    var tocConfig = Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc);
+    if (isExpandAllEnabled()) {
+      tocConfig.collapseDepth = 6;
+    }
+    window.tocbot.init(tocConfig);
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+    expandAllToc();
+    bindTocToggle();
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+        expandAllToc();
+        bindTocToggle();
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/openkounter.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

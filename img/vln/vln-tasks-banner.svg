@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+<title id="title">视觉语言导航任务与路径评价</title>
+<desc id="desc">深色建筑平面上，两条不同路线连接相同起终点，表示到达与路线忠实度的差异。</desc>
+<defs>
+ <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#081421"/><stop offset="1" stop-color="#152b40"/></linearGradient>
+ <radialGradient id="glow"><stop stop-color="#38bdf8" stop-opacity=".14"/><stop offset="1" stop-color="#38bdf8" stop-opacity="0"/></radialGradient>
+ <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse"><path d="M64 0H0V64" fill="none" stroke="#83a9c5" stroke-opacity=".055"/></pattern>
+</defs>
+<rect width="1600" height="900" fill="url(#bg)"/><rect width="1600" height="900" fill="url(#grid)"/>
+<ellipse cx="800" cy="430" rx="720" ry="460" fill="url(#glow)"/>
+<g transform="translate(290 180)" fill="#1b3349" stroke="#58768e" stroke-width="3">
+ <path d="M0 0H1020V540H0Z" fill="#112438"/>
+ <path d="M0 0H310V180H0ZM430 0H730V180H430ZM850 0H1020V300H850ZM0 320H310V540H0ZM430 360H730V540H430ZM850 420H1020V540H850"/>
+ <g stroke="#7993a7" opacity=".45" fill="none"><rect x="65" y="48" width="175" height="70" rx="14"/><rect x="470" y="42" width="210" height="82" rx="10"/><rect x="60" y="383" width="185" height="94" rx="8"/><rect x="488" y="410" width="179" height="75" rx="8"/></g>
+ <path d="M90 253H370V250H790V355H935" fill="none" stroke="#f2b461" stroke-width="7" stroke-dasharray="13 13"/>
+ <path d="M90 253H370V55Q370 30 395 30V255H790V355H935" fill="none" stroke="#48c9d4" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+ <g fill="#112438" stroke="#48c9d4" stroke-width="5"><circle cx="370" cy="90" r="13"/><circle cx="560" cy="255" r="13"/><circle cx="790" cy="355" r="13"/></g>
+ <circle cx="90" cy="253" r="23" fill="#48c9d4" stroke="none"/>
+ <circle cx="935" cy="355" r="40" stroke="#f2b461" fill="none" stroke-dasharray="4 9"/><circle cx="935" cy="355" r="20" fill="#f2b461" stroke="none"/>
+</g>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="120 60 520 340" role="img" aria-labelledby="title desc">
+<title id="title">终点相同，路线评价不同</title><desc id="desc">四条边均长四米。蓝色参考路线从S经A、B到G长十二米，橙色捷径从S到G长四米。前者SPL为0.3333，后者为1；前者CLS和nDTW均为1，后者分别为0.4291和0.5134。</desc>
+<defs><marker id="blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#56c7d0"/></marker><marker id="orange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#f2b461"/></marker></defs>
+<rect width="760" height="420" rx="16" fill="#102235"/>
+<g font-family="Segoe UI,Microsoft YaHei,sans-serif">
+
+<path d="M235 330V120H525V330H235" fill="none" stroke="#426077" stroke-width="3"/>
+<g stroke="#56c7d0" stroke-width="5" fill="none" marker-end="url(#blue)"><path d="M235 312V144"/><path d="M253 120H501"/><path d="M525 138V306"/></g>
+<path d="M256 330H501" fill="none" stroke="#f2b461" stroke-width="5" stroke-dasharray="10 7" marker-end="url(#orange)"/>
+<g fill="#102235" stroke="#d8e7ef" stroke-width="3"><circle cx="235" cy="120" r="12"/><circle cx="525" cy="120" r="12"/><circle cx="235" cy="330" r="12"/><circle cx="525" cy="330" r="12"/></g>
+<g fill="#ecf3f8" font-size="24" font-weight="600"><text x="193" y="115">A</text><text x="550" y="115">B</text><text x="192" y="348">S</text><text x="550" y="348">G</text></g>
+<g fill="#a7bfd0" font-size="20" text-anchor="middle"><text x="380" y="104">4 m</text><text x="190" y="232">4 m</text><text x="570" y="232">4 m</text><text x="380" y="360">4 m</text></g>
+</g></svg>

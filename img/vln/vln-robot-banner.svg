@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#091926"/><stop offset="1" stop-color="#18394a"/></linearGradient><pattern id="grid" width="75" height="75" patternUnits="userSpaceOnUse"><path d="M75 0H0V75" fill="none" stroke="#7db6c8" stroke-opacity=".09"/></pattern><linearGradient id="cone"><stop stop-color="#6ce6d2" stop-opacity=".3"/><stop offset="1" stop-color="#6ce6d2" stop-opacity=".02"/></linearGradient></defs>
+<rect width="1600" height="900" fill="url(#bg)"/><rect width="1600" height="900" fill="url(#grid)"/>
+<g transform="translate(90 220)" stroke="#547e94" stroke-width="3" fill="#183347"><path d="M70 230L310 90L590 250L350 390Z"/><path d="M70 230V60L310 -80V90M310 -80L590 80V250" fill="none"/><path d="M175 293V164L290 95V224Z"/><path d="M410 352V222L510 164V294Z"/></g>
+<path d="M255 480L370 550L475 490L595 560L755 474L910 558L1110 447L1325 568" stroke="#e9b772" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="10 15" fill="none"/>
+<g fill="#72dfd0" stroke="#163844" stroke-width="5"><circle cx="255" cy="480" r="13"/><circle cx="475" cy="490" r="13"/><circle cx="755" cy="474" r="13"/><circle cx="1110" cy="447" r="13"/><circle cx="1325" cy="568" r="13"/></g>
+<path d="M916 442L1285 270L1300 590Z" fill="url(#cone)"/>
+<g fill="#31576d" stroke="#80b4c5" stroke-width="4" stroke-linejoin="round"><path d="M740 397L848 337L989 403L881 470Z"/><path d="M740 397V448L881 520V470Z"/><path d="M881 470L989 403V451L881 520Z"/><path d="M937 370L1016 392V437L952 455L928 407Z"/>
+<path d="M760 451L723 537L759 626" fill="none" stroke-width="16"/><path d="M841 487L814 572L850 657" fill="none" stroke-width="16"/><path d="M963 457L1003 534L970 621" fill="none" stroke-width="16"/><path d="M893 502L930 585L901 668" fill="none" stroke-width="16"/></g>
+<g fill="#8de8d5"><circle cx="988" cy="411" r="9"/><circle cx="760" cy="451" r="10"/><circle cx="841" cy="487" r="10"/><circle cx="963" cy="457" r="10"/><circle cx="893" cy="502" r="10"/></g>
+<g fill="none" stroke="#75c2c6" stroke-opacity=".5" stroke-width="3"><ellipse cx="850" cy="676" rx="177" ry="47"/><path d="M1110 730L1420 553M1110 689L1420 512M1165 760L1165 584M1240 716L1240 540M1315 671L1315 496M1390 629L1390 452"/></g>
+</svg>

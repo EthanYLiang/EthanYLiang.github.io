@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1640 720" role="img" aria-labelledby="title desc">
+  <title id="title">视觉语言导航与机器人执行闭环</title>
+  <desc id="desc">语言和视觉进入导航决策，候选目标经过定位与地图校验后交给规划和控制；执行状态反馈到下一轮决策，校验失败的原因直接返回。</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1">
+      <stop offset="0" stop-color="#142034"/>
+      <stop offset="1" stop-color="#1c2b3d"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="12" stdDeviation="15" flood-color="#07111f" flood-opacity=".5"/>
+    </filter>
+    <marker id="return" markerUnits="userSpaceOnUse" markerWidth="24" markerHeight="24" refX="20" refY="12" orient="auto">
+      <path d="M3 3 20 12 3 21Z" fill="#f4b76b"/>
+    </marker>
+    <marker id="loop" markerUnits="userSpaceOnUse" markerWidth="24" markerHeight="24" refX="20" refY="12" orient="auto">
+      <path d="M3 3 20 12 3 21Z" fill="#52d5c8"/>
+    </marker>
+    <style>
+      text { font-family: "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+      .heading { fill:#f5f9ff; font-size:47px; font-weight:700; }
+      .sub { fill:#afc0d2; font-size:24px; }
+      .step { font-size:22px; font-weight:700; }
+      .name { fill:#f5f9ff; font-size:30px; font-weight:700; }
+      .detail { fill:#c5d2e1; font-size:21px; }
+      .label { font-size:21px; font-weight:700; }
+    </style>
+  </defs>
+  <rect width="1640" height="720" rx="30" fill="url(#bg)"/>
+  <text class="heading" x="70" y="82">从语义目标到机器人执行</text>
+  <text class="sub" x="72" y="123">五个处理环节 · 两条回路 · 一个共享的空间状态</text>
+  <path d="M70 148H1570" stroke="#466078" stroke-width="2" opacity=".6"/>
+
+  <path d="M320 309H374M625 309H679M930 309H984M1235 309H1289" fill="none" stroke="#b8cada" stroke-width="5" stroke-linecap="round"/>
+  <path d="M807 214V194H502V214" fill="none" stroke="#f4b76b" stroke-width="4" stroke-dasharray="9 8" marker-end="url(#return)"/>
+  <text class="label" x="570" y="180" fill="#ffd08b">目标无效 · 返回原因</text>
+  <path d="M1418 399V612H502V406" fill="none" stroke="#52d5c8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#loop)"/>
+  <text class="label" x="915" y="645" fill="#7be6dc">新观测与执行状态反馈</text>
+
+  <g filter="url(#shadow)">
+    <rect x="75" y="220" width="245" height="180" rx="22" fill="#23374b" stroke="#53c7e5" stroke-width="2"/>
+    <rect x="380" y="220" width="245" height="180" rx="22" fill="#2c2b50" stroke="#ae9af7" stroke-width="2"/>
+    <rect x="685" y="220" width="245" height="180" rx="22" fill="#46372f" stroke="#f4b76b" stroke-width="2"/>
+    <rect x="990" y="220" width="245" height="180" rx="22" fill="#214440" stroke="#52d5c8" stroke-width="2"/>
+    <rect x="1295" y="220" width="245" height="180" rx="22" fill="#23374b" stroke="#53c7e5" stroke-width="2"/>
+  </g>
+  <path d="M351 298 376 309 351 320ZM656 298 681 309 656 320ZM961 298 986 309 961 320ZM1266 298 1291 309 1266 320Z" fill="#b8cada"/>
+  <g>
+    <text class="step" x="101" y="262" fill="#70dcf6">01  输入</text>
+    <text class="name" x="101" y="315">指令与视觉</text>
+    <text class="detail" x="101" y="357">语言 · 当前画面</text>
+
+    <text class="step" x="406" y="262" fill="#c8b9ff">02  决策</text>
+    <text class="name" x="406" y="315">VLN 模型</text>
+    <text class="detail" x="406" y="357">候选目标或动作</text>
+
+    <text class="step" x="711" y="262" fill="#ffd08b">03  校验</text>
+    <text class="name" x="711" y="315">目标校验</text>
+    <text class="detail" x="711" y="357">坐标 · 时效 · 净空</text>
+
+    <text class="step" x="1016" y="262" fill="#7be6dc">04  执行</text>
+    <text class="name" x="1016" y="315">规划与控制</text>
+    <text class="detail" x="1016" y="357">路径 · 运动 · 停止</text>
+
+    <text class="step" x="1321" y="262" fill="#70dcf6">05  反馈</text>
+    <text class="name" x="1321" y="315">执行状态</text>
+    <text class="detail" x="1321" y="357">到达 · 受阻 · 定位</text>
+  </g>
+  <path d="M807 458V409" fill="none" stroke="#f4b76b" stroke-width="4" marker-end="url(#return)"/>
+  <rect x="686" y="458" width="243" height="96" rx="18" fill="#283b4f" stroke="#6889a6" stroke-width="2"/>
+  <text x="807" y="497" fill="#f5f9ff" font-size="26" font-weight="700" text-anchor="middle">定位与地图</text>
+  <text x="807" y="530" fill="#b7cadb" font-size="20" text-anchor="middle">位姿 · 障碍 · 可行区域</text>
+  <text x="72" y="686" fill="#aebed0" font-size="21">校验失败返回决策；执行反馈更新下一轮目标。</text>
+</svg>

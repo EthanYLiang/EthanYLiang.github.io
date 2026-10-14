@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc">
+  <title id="title">视觉语言导航综述封面</title>
+  <desc id="desc">语言指令、第一视角视觉、地图路径与机器人执行反馈组成的导航闭环。</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#071321"/>
+      <stop offset="0.55" stop-color="#0d2034"/>
+      <stop offset="1" stop-color="#13213b"/>
+    </linearGradient>
+    <radialGradient id="halo">
+      <stop offset="0" stop-color="#0ea5e9" stop-opacity="0.27"/>
+      <stop offset="1" stop-color="#0ea5e9" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 H 0 V 60" fill="none" stroke="#7dd3fc" stroke-width="1" opacity="0.11"/>
+    </pattern>
+    <marker id="arrow" markerWidth="14" markerHeight="14" refX="11" refY="7" orient="auto">
+      <path d="M 2 2 L 12 7 L 2 12 Z" fill="#48e2bd"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="22" flood-color="#020617" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#background)"/>
+  <rect width="1920" height="1080" fill="url(#grid)"/>
+  <circle cx="1150" cy="590" r="650" fill="url(#halo)"/>
+
+  <!-- 语言与视觉输入 -->
+  <g filter="url(#shadow)" transform="translate(0,-110)">
+    <rect x="150" y="325" width="475" height="430" rx="30" fill="#16283d" stroke="#39708b" stroke-width="2"/>
+    <path d="M 192 352 L 212 325 H 330" fill="none" stroke="#49c9f5" stroke-width="5"/>
+    <rect x="195" y="380" width="385" height="115" rx="20" fill="#20384d" stroke="#49748b"/>
+    <path d="M 233 432 h 33 a 12 12 0 0 0 12 -12 v -3 a 12 12 0 0 0 -12 -12 h -33 a 12 12 0 0 0 -12 12 v 3 a 12 12 0 0 0 12 12 Z M 235 432 l -7 13 l 22 -13" fill="none" stroke="#7dd3fc" stroke-width="5" stroke-linejoin="round"/>
+    <circle cx="321" cy="415" r="8" fill="#48e2bd"/>
+    <path d="M 345 415 H 530 M 317 450 H 490" fill="none" stroke="#cde9f5" stroke-width="8" stroke-linecap="round"/>
+    <rect x="195" y="527" width="385" height="176" rx="20" fill="#0d1f31" stroke="#49748b"/>
+    <path d="M 220 660 L 305 575 L 362 626 L 418 560 L 554 660 Z" fill="#24506a"/>
+    <path d="M 220 660 L 290 600 L 354 654 Z" fill="#327194"/>
+    <rect x="460" y="568" width="63" height="62" rx="8" fill="none" stroke="#fb7185" stroke-width="5"/>
+    <circle cx="491" cy="600" r="7" fill="#fb7185"/>
+    <path d="M 232 550 h 30 M 232 550 v 30 M 545 550 h -30 M 545 550 v 30 M 232 680 h 30 M 232 680 v -30 M 545 680 h -30 M 545 680 v -30" fill="none" stroke="#7dd3fc" stroke-width="4"/>
+  </g>
+
+  <!-- 地图、路径与目标 -->
+  <g filter="url(#shadow)" transform="translate(0,-110)">
+    <rect x="755" y="300" width="1020" height="590" rx="35" fill="#11243a" stroke="#376986" stroke-width="3"/>
+    <path d="M 815 390 H 1240 V 330 M 1240 390 H 1715 M 815 390 V 830 H 1395 M 1395 830 H 1715 V 390 M 1120 390 V 570 H 980 M 1120 650 V 830 M 1395 390 V 555 M 1395 650 V 830" fill="none" stroke="#5b8197" stroke-width="19" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 825 705 C 990 694 1052 782 1180 735 C 1300 690 1197 561 1360 567 C 1490 572 1520 647 1650 659" fill="none" stroke="#48e2bd" stroke-width="12" stroke-linecap="round" marker-end="url(#arrow)"/>
+    <path d="M 825 705 C 990 694 1052 782 1180 735 C 1300 690 1197 561 1360 567 C 1490 572 1520 647 1650 659" fill="none" stroke="#c9fff0" stroke-width="3" stroke-dasharray="4 17" opacity="0.7"/>
+    <circle cx="860" cy="705" r="47" fill="#163c54" stroke="#7dd3fc" stroke-width="5"/>
+    <path d="M 840 719 V 692 L 860 678 L 880 692 V 719 Z M 847 704 H 873" fill="none" stroke="#d9f8ff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="1658" cy="660" r="58" fill="#fb7185" opacity="0.13"/>
+    <circle cx="1658" cy="660" r="41" fill="none" stroke="#fb7185" stroke-width="5"/>
+    <circle cx="1658" cy="660" r="13" fill="#fb7185"/>
+    <path d="M 1628 538 h 60 v 16 h -60 Z M 1638 554 v 30 M 1678 554 v 30" fill="none" stroke="#fb7185" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="1190" cy="738" r="12" fill="#48e2bd"/>
+    <circle cx="1360" cy="567" r="12" fill="#48e2bd"/>
+  </g>
+
+  <!-- 输入、决策与执行反馈三个无文字图标 -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 615 442 H 710" stroke="#7dd3fc" stroke-width="8" stroke-dasharray="12 14" marker-end="url(#arrow)"/>
+    <path d="M 455 735 C 455 900 630 937 790 937 H 1560 C 1695 937 1710 878 1710 820" stroke="#398f9b" stroke-width="5" stroke-dasharray="12 14" opacity="0.7"/>
+    <circle cx="455" cy="865" r="43" fill="#123b50" stroke="#4aa5c4" stroke-width="4"/>
+    <path d="M 436 873 v -25 h 38 v 25 h -17 l -11 11 v -11 Z" stroke="#9ae8ff" stroke-width="5"/>
+    <circle cx="1040" cy="937" r="43" fill="#124343" stroke="#46a997" stroke-width="4"/>
+    <path d="M 1023 937 l 12 12 l 24 -27" stroke="#89f7d9" stroke-width="6"/>
+    <circle cx="1580" cy="937" r="43" fill="#493244" stroke="#c46a8e" stroke-width="4"/>
+    <path d="M 1563 944 a 20 20 0 1 1 24 10 M 1587 954 l -9 -14 l 17 2" stroke="#ff9ab0" stroke-width="5"/>
+  </g>
+</svg>

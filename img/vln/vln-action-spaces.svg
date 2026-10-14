@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 440" role="img" aria-labelledby="title desc">
+<title id="title">三种动作接口</title><desc id="desc">左图选择离散图节点，中图在连续环境中执行固定步进，右图输出连续值速度。三者的决策粒度不同。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#56c7d0"/></marker></defs>
+<rect width="1080" height="440" rx="16" fill="#102235"/>
+<g font-family="Segoe UI,Microsoft YaHei,sans-serif">
+<g fill="#182f44" stroke="#345065"><rect x="22" y="22" width="332" height="396" rx="12"/><rect x="374" y="22" width="332" height="396" rx="12"/><rect x="726" y="22" width="332" height="396" rx="12"/></g>
+<g font-size="22" fill="#ecf3f8" font-weight="600"><text x="44" y="65">图节点选择</text><text x="396" y="65">离散运动步进</text><text x="748" y="65">连续值控制</text></g>
+<g fill="none" stroke="#527087" stroke-width="3"><path d="M75 278L170 168L278 255L281 126M170 168L93 123"/><path d="M425 284V130H650V286"/><path d="M775 284V130H1000V286"/></g>
+<path d="M75 278L170 168L278 255" fill="none" stroke="#56c7d0" stroke-width="5" marker-mid="url(#arrow)" marker-end="url(#arrow)"/>
+<g fill="#102235" stroke="#6b879d" stroke-width="3"><circle cx="93" cy="123" r="10"/><circle cx="281" cy="126" r="10"/></g>
+<g fill="#56c7d0"><circle cx="75" cy="278" r="11"/><circle cx="170" cy="168" r="11"/><circle cx="278" cy="255" r="11"/></g>
+<path d="M458 282V182H620V280" fill="none" stroke="#56c7d0" stroke-width="3" stroke-dasharray="4 6"/>
+<g fill="#56c7d0"><path d="M451 259l7-14 7 14ZM451 227l7-14 7 14ZM451 195l7-14 7 14ZM492 175l14 7-14 7ZM531 175l14 7-14 7ZM570 175l14 7-14 7ZM613 214l7 14 7-14ZM613 249l7 14 7-14Z"/></g>
+<path d="M804 282V220Q804 180 844 180H930Q970 180 970 220V278" fill="none" stroke="#56c7d0" stroke-width="5" marker-end="url(#arrow)"/>
+<path d="M876 180L906 149" fill="none" stroke="#f2b461" stroke-width="3"/><path d="M851 162Q877 136 902 140" fill="none" stroke="#f2b461" stroke-width="2"/>
+<g font-size="18" fill="#bbccda"><text x="44" y="351">选择相邻视点</text><text x="44" y="383">局部连通关系由环境给出</text><text x="396" y="351">固定距离前进 / 固定角度转动</text><text x="396" y="383">空间连续，动作选项有限</text><text x="748" y="351">线速度 / 角速度</text><text x="748" y="383">执行取决于频率与动力学</text></g>
+</g></svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="语言序列、视觉观测与导航路径交汇的抽象图形">
+<defs><radialGradient id="bg"><stop stop-color="#1b3b50"/><stop offset="1" stop-color="#0b1525"/></radialGradient><linearGradient id="line"><stop stop-color="#a99aed"/><stop offset=".55" stop-color="#59cfc3"/><stop offset="1" stop-color="#f0b36b"/></linearGradient><pattern id="grid" width="70" height="70" patternUnits="userSpaceOnUse"><path d="M70 0H0V70" fill="none" stroke="#2a4057" stroke-opacity=".25"/></pattern></defs>
+<rect width="1600" height="900" fill="url(#bg)"/><rect width="1600" height="900" fill="url(#grid)"/>
+<g fill="none" stroke="#395970" stroke-width="3"><path d="M275 570V305H620V665H1010V255H1330V595H1120"/><path d="M275 430H460V570H620M800 665V470H1010M1160 255V405H1330"/></g>
+<g fill="#24334f" stroke="#a99aed" stroke-width="2"><rect x="220" y="165" width="85" height="34" rx="10"/><rect x="325" y="165" width="132" height="34" rx="10"/><rect x="477" y="165" width="94" height="34" rx="10"/><rect x="591" y="165" width="145" height="34" rx="10"/></g>
+<g fill="none" stroke="#6c93ad" stroke-opacity=".3" stroke-width="2"><path d="M262 200L795 447M390 200L795 447M520 200L795 447M660 200L795 447M1160 684L795 447M1250 640L795 447M1320 705L795 447"/></g>
+<path d="M275 570V305H620V665H1010V405H1160" fill="none" stroke="url(#line)" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"/>
+<g fill="#112b3b" stroke="#72d6cb" stroke-width="4"><circle cx="275" cy="570" r="14"/><circle cx="620" cy="305" r="14"/><circle cx="620" cy="665" r="14"/><circle cx="1010" cy="665" r="14"/></g>
+<circle cx="795" cy="447" r="74" fill="#193b4c" stroke="#66d4c8" stroke-width="2"/><circle cx="795" cy="447" r="49" fill="none" stroke="#66d4c8" stroke-opacity=".35" stroke-width="1.5"/><path d="M783 429L815 447L783 465Z" fill="#a6ebe0"/>
+<g fill="#1e3447" stroke="#78acbd" stroke-width="2"><rect x="1110" y="660" width="98" height="64" rx="10"/><rect x="1225" y="605" width="98" height="64" rx="10"/><rect x="1265" y="698" width="98" height="64" rx="10"/></g>
+<g fill="none" stroke="#78acbd" stroke-width="2"><path d="M1124 710L1145 681L1165 700L1181 685L1194 710M1239 655L1260 626L1280 645L1296 630L1309 655M1279 748L1300 719L1320 738L1336 723L1349 748"/></g>
+<circle cx="1160" cy="405" r="20" fill="#edb575"/><circle cx="1160" cy="405" r="39" fill="none" stroke="#edb575" stroke-opacity=".4" stroke-width="2"/>
+</svg>
